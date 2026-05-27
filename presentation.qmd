@@ -1,0 +1,161 @@
+---
+title: What factors have the greatest impact on the performance in the Premier League, UK?
+author: Green Lizard <br> Martina Belda, David Yang, Timothy Kipruto
+date: 05/01/2026
+format:
+  revealjs:
+    theme: default
+    fontsize: 28px
+execute:
+  echo: false
+---
+
+## Topic & motivation
+
+**What truly drives success in the Premier League: money, experience, or defensive discipline?**
+
+We examine the impact of those thre variables:
+
+::: {.incremental}
+- Player age across positions
+- Team spending
+- Defensive discipline: yellow and red cards by position
+:::
+
+## Introduce the data
+
+### Data Overview
+
+Three factor categories examined:
+
+-   **Disciplinary** — yellow and red cards by position 
+
+-   **Financial** — transfer spending and net spend -
+
+-   **Squad** — average age and total market value
+
+### Variables
+
+-   **Performance:** total points and league ranking
+-   **Disciplinary:** cards by position group (DF, MF, FW)
+-   **Financial:** transfer spending in millions USD
+-   **Squad value:** Transfermarkt market value in millions EUR
+
+------------------------------------------------------------------------
+
+## Highlights from EDA
+
+:::: {.columns}
+::: {.column width="50%"}
+#### Data Processing
+- Combined multi-season data (2019–2025) into one dataset
+- Standardized formats (season, team names)
+- Aggregated player data → team level and merged into final datasets
+
+### Initial EDA Findings
+- Performance stable across seasons; a few dominant outliers
+- Discipline (cards) → slight negative but weak impact
+- Spending → moderate positive effect with diminishing returns
+- Age → very weak relationship with performance
+:::
+::: {.column width="50%"}
+**Takeaway:**  
+Spending matters, but success depends on **multiple hidden factors** 
+
+### Data Limitations
+- **Sample size:** Only 6 seasons 
+- **Inconsistancy** Inconsistent player position data, some missing financial data
+- **Potential omitted variables** Manager quality, injuries, tactical factors.
+:::
+::::
+
+## Model 1: Disciplinary Behavior and Performance
+
+-   $H_0$: Cards (yellow/red) have no impact on team performance\
+-   $H_A$: Increased cards negatively impact points (β \< 0)\
+-   $H_{A2}$: Defensive aggression (yellow cards by defenders) may improve performance (β \> 0)
+
+::::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| eval: false
+#| echo: true
+mod_cards <- lm(
+  Pts ~ yellow_DF + yellow_MF + yellow_FW + red_DF + red_MF + red_FW
+)
+```
+
+:::
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+#| echo: true
+mod_yellow <- lm(Pts ~ total_yellow)
+mod_red <- lm(Pts ~ total_reds)
+```
+
+:::
+:::::
+
+<!-- I asked ChatGPT for help to set up the layout -->
+
+::::: columns
+:::: {.column width="30%"}
+Results:
+
+![](report_files/figure-typst/distribution-yellow_DF-1.svg){width=100%}  
+
+::::
+:::: {.column width="70%"}
+::: {.incremental}
+
+-   Defensive aggression: **not supported** -> performed a hypothesis test (p-val = 0.17) and boostrap (ci crossed 0)
+-   Yellow cards (MF): **−0.57 pts/card** (significant)
+-   Total yellows and total reds were significant (p \< 0.001 and p ≈ 0.026)
+-   **Aggregated model: Adjusted R² = 0.165 weak explanatory power**
+:::
+::::
+:::::
+
+
+## Model 2: Team Financial Investment and Performance
+-   $H_0$: Transfer spending, squad age, and squad value have no effect on performance
+-   $H_A$: At least one of these variables significantly affects performance
+
+### Results: 
+- Based on our model Ranking\_{team} = $\beta_{0}$ + $\beta_{1}$ \* TransferSpendingTeam + $\beta_{2}$ \* SquadAgeTeam+ $\beta_{3}$ \* SqaudValue + $\epsilon_{team}$
+- Model significant (R² ≈ 0.63, p < 0.001) → good explanatory power
+- Squad value: **strongest predictor**, 0.018 better ranking with each 1 million more squad value
+- Transfer spending: **strong predictor** but less weaker than total squad value
+- squad age: **not significant** (p ≈ 0.12), no clear relationship with performance
+
+:::: {.columns}
+::: {.column width="39%"}
+![](report_files/Squad_Value_Ranking.png){width=100%}  
+
+:::
+
+::: {.column width="29%"}
+![](report_files/Spending_Ranking.png){width=100%}  
+:::
+
+::: {.column width="29%"}
+![](report_files/Age_ranking.png){width=100%}  
+:::
+::::
+
+## Conclusions + future work
+
+### Conclusions
+
+-   **Squad quality** is the strongest predictor of performance
+-   Disciplinary behavior has a small but measurable association but insufficient to be a primary driver over a full season
+-   Higher transfer spending is associated with worse rankings, consistent with reactive spending by weaker teams
+-   Long-term investment in player quality appears more consequential than short-term financial activity or in-game behavior
+
+### Future Work
+
+-   **Tactical and managerial factors** — controlling for manager tenure and playing style
+-   **Injury and availability** — accounting for player absences throughout the season
+-   **Within-season analysis** — match-level data may reveal short-run disciplinary effects diluted by full-season aggregation

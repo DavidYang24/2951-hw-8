@@ -1,0 +1,121 @@
+"Rk","Squad","MP","W","D","L","GF","GA","GD","Pts","Pts/MP","Attendance","Top Team Scorer","Goalkeeper","Notes","Season","Last 5","spend_usd","income_usd","net_spend_usd","squad_value_eur","avg_age","count_CrdY","count_CrdR"
+1,"Manchester City",38,27,5,6,83,32,51,86,2.26,526,"<U+0130>lkay G<U+00FC>ndo<U+011F>an-13","Ederson","<U+2192> Champions League via league finish",21,NA,187272000,69120000,118152000,"<U+20AC>1.04bn",25.3,46,2
+2,"Manchester United",38,21,11,6,73,44,29,74,1.95,526,"Bruno Fernandes-18","David de Gea","<U+2192> Champions League via league finish",21,NA,90666000,21060000,69606000,"<U+20AC>770.05m",25.4,64,1
+3,"Liverpool FC",38,20,9,9,68,42,26,69,1.82,837,"Mohamed Salah-22","Alisson","<U+2192> Champions League via league finish",21,NA,91584000,18576000,73008000,"<U+20AC>969.65m",24.9,40,0
+4,"Chelsea FC",38,19,10,9,58,36,22,67,1.76,526,"Jorginho-7","Edouard Mendy","<U+2192> Champions League via league finish",21,NA,288576000,61722000,226854000,"<U+20AC>889.20m",25.7,51,3
+5,"Leicester City",38,20,6,12,68,50,18,66,1.74,421,"Jamie Vardy-15","Kasper Schmeichel","<U+2192> Europa League via cup win",21,NA,64152000,58071600,6080400,"<U+20AC>510.60m",25.8,61,0
+6,"West Ham United",38,19,8,11,62,47,15,65,1.71,632,"Michail Antonio,Tom<U+00E1><U+0161> Sou<U+010D>ek-10","<U+0141>ukasz Fabia<U+0144>ski","<U+2192> Europa League via league finish",21,NA,59076000,49042800,10033200,"<U+20AC>336.40m",26.8,50,3
+7,"Tottenham Hotspur",38,18,8,12,68,45,23,62,1.63,632,"Harry Kane-23","Hugo Lloris","<U+2192> Europa Conference League via league finish1",21,NA,119340000,14364000,104976000,"<U+20AC>703.50m",25.2,57,2
+8,"Arsenal FC",38,18,7,13,55,39,16,61,1.61,632,"Alexandre Lacazette-13","Bernd Leno",NA,21,NA,92880000,20682000,72198000,"<U+20AC>619.25m",24.9,49,5
+9,"Leeds United",38,18,5,15,62,54,8,59,1.55,421,"Patrick Bamford-17","Illan Meslier",NA,21,NA,138024000,0,138024000,"<U+20AC>238.10m",25.1,61,1
+10,"Everton FC",38,17,8,13,47,48,-1,59,1.55,368,"Dominic Calvert-Lewin-16","Jordan Pickford",NA,21,NA,80319600,4784400,75535200,"<U+20AC>511.20m",25.2,59,2
+11,"Aston Villa",38,16,7,15,55,46,9,55,1.45,526,"Ollie Watkins-14","Emiliano Mart<U+00ED>nez",NA,21,NA,109458000,2991600,106466400,"<U+20AC>430.70m",23.9,71,4
+12,"Newcastle United",38,12,9,17,46,62,-16,45,1.18,526,"Callum Wilson-12","Karl Darlow",NA,21,NA,41850000,842400,41007600,"<U+20AC>255.35m",27.4,65,3
+13,"Wolverhampton Wanderers",38,12,9,17,36,52,-16,45,1.18,237,"R<U+00FA>ben Neves,Pedro Neto-5","Rui Patr<U+00ED>cio",NA,21,NA,94596120,85536000,9060120,"<U+20AC>450.30m",24.4,55,1
+14,"Crystal Palace",38,12,8,18,41,66,-25,44,1.16,447,"Wilfried Zaha-11","Vicente Guaita",NA,21,NA,24192000,21600000,2592000,"<U+20AC>193.85m",28.2,56,2
+15,"Southampton FC",38,12,7,19,47,68,-21,43,1.13,526,"Danny Ings-12","Alex McCarthy",NA,21,NA,40284000,28404000,11880000,"<U+20AC>282.80m",25,52,3
+16,"Brighton & Hove Albion",38,9,14,15,40,46,-6,41,1.08,523,"Neal Maupay-8","Robert S<U+00E1>nchez",NA,21,NA,54108000,22248000,31860000,"<U+20AC>290.40m",24.9,49,6
+17,"Burnley FC",38,10,9,19,33,55,-22,39,1.03,178,"Chris Wood-12","Nick Pope",NA,21,NA,1188000,2484000,-1296000,"<U+20AC>132.30m",27.1,48,0
+18,"Fulham FC",38,5,13,20,27,53,-26,28,0.74,211,"Bobby De Cordova-Reid-5","Alphonse Areola","Relegated",21,NA,40230000,0,40230000,"<U+20AC>239.75m",27,67,3
+19,"West Bromwich Albion",38,5,11,22,35,76,-41,26,0.68,283,"Matheus Pereira-11","Sam Johnstone","Relegated",21,NA,45511200,8748000,36763200,"<U+20AC>141.15m",26.6,51,4
+20,"Sheffield United",38,7,2,29,20,63,-43,23,0.61,263,"David McGoldrick-8","Aaron Ramsdale","Relegated",21,NA,67716000,0,67716000,"<U+20AC>149.85m",25.4,73,3
+1,"Manchester City",38,29,6,3,99,26,73,93,2.45,52774,"Kevin De Bruyne-15","Ederson","<U+2192> Champions League via league finish",22,NA,150012000,101304000,48708000,"<U+20AC>1.00bn",24.7,42,1
+2,"Liverpool FC",38,28,8,2,94,26,68,92,2.42,53352,"Mohamed Salah-23","Alisson","<U+2192> Champions League via league finish",22,NA,96120000,34182000,61938000,"<U+20AC>918.90m",24.5,50,1
+3,"Chelsea FC",38,21,11,6,76,33,43,74,1.95,36443,"Mason Mount-11","Edouard Mendy","<U+2192> Champions League via league finish",22,NA,127440000,170197200,-42757200,"<U+20AC>914.50m",25.6,63,1
+4,"Tottenham Hotspur",38,22,5,11,69,40,29,71,1.87,56523,"Son Heung-min-23","Hugo Lloris","<U+2192> Champions League via league finish",22,NA,103572000,37389600,66182400,"<U+20AC>689.35m",24,69,1
+5,"Arsenal FC",38,22,3,13,61,48,13,69,1.82,59665,"Bukayo Saka-11","Aaron Ramsdale","<U+2192> Europa League via league finish",22,NA,180792000,33912000,146880000,"<U+20AC>613.05m",24,67,4
+6,"Manchester United",38,16,10,12,57,57,0,58,1.53,73150,"Cristiano Ronaldo-18","David de Gea","<U+2192> Europa League via league finish",22,NA,153360000,33588000,119772000,"<U+20AC>769.15m",26,77,2
+7,"West Ham United",38,16,8,14,60,51,9,56,1.47,58370,"Jarrod Bowen-12","<U+0141>ukasz Fabia<U+0144>ski","<U+2192> Europa Conference League via league finish",22,NA,80460000,4573800,75886200,"<U+20AC>354.90m",26.3,52,3
+8,"Leicester City",38,14,10,14,62,59,3,52,1.37,32493,"Jamie Vardy-15","Kasper Schmeichel",NA,22,NA,73008000,4320000,68688000,"<U+20AC>526.55m",25.7,55,1
+9,"Brighton & Hove Albion",38,12,15,11,42,44,-2,51,1.34,30966,"Leandro Trossard,Neal Maupay-8","Robert S<U+00E1>nchez",NA,22,NA,81626400,85104000,-3477600,"<U+20AC>318.00m",24.6,72,2
+10,"Wolverhampton Wanderers",38,15,6,17,38,43,-5,51,1.34,30841,"Ra<U+00FA>l Jim<U+00E9>nez-6","Jos<U+00E9> S<U+00E1>",NA,22,NA,40608000,34344000,6264000,"<U+20AC>376.95m",24.8,62,2
+11,"Newcastle United",38,13,10,15,44,62,-18,49,1.29,51487,"Callum Wilson-8","Martin D<U+00FA>bravka",NA,22,NA,140940000,0,140940000,"<U+20AC>313.90m",27.9,81,2
+12,"Crystal Palace",38,11,15,12,50,46,4,48,1.26,24588,"Wilfried Zaha-14","Vicente Guaita",NA,22,NA,92469600,0,92469600,"<U+20AC>271.05m",26.5,69,1
+13,"Brentford FC",38,13,7,18,48,56,-8,46,1.21,16918,"Ivan Toney-12","David Raya",NA,22,NA,41256000,1080000,40176000,"<U+20AC>273.30m",24.7,65,3
+14,"Aston Villa",38,13,6,19,52,54,-2,45,1.18,41681,"Ollie Watkins-11","Emiliano Mart<U+00ED>nez",NA,22,NA,140184000,137160000,3024000,"<U+20AC>487.75m",24.8,81,2
+15,"Southampton FC",38,9,13,16,43,67,-24,40,1.05,30134,"James Ward-Prowse-10","Fraser Forster",NA,22,NA,68472000,65178000,3294000,"<U+20AC>274.30m",25.6,65,2
+16,"Everton FC",38,11,6,21,43,66,-23,39,1.03,38446,"Richarlison-10","Jordan Pickford",NA,22,NA,42660000,49680000,-7020000,"<U+20AC>479.05m",26,82,6
+17,"Leeds United",38,9,11,18,42,79,-37,38,1,36308,"Raphinha-11","Illan Meslier",NA,22,NA,64044000,0,64044000,"<U+20AC>299.45m",24,100,3
+18,"Burnley FC",38,7,14,17,34,53,-19,35,0.92,19278,"Maxwel Cornet-9","Nick Pope","Relegated",22,NA,53352000,43740000,9612000,"<U+20AC>137.85m",27.9,68,2
+19,"Watford FC",38,6,5,27,34,77,-43,23,0.61,20614,"Emmanuel Dennis-10","Ben Foster","Relegated",22,NA,46980000,13878000,33102000,"<U+20AC>156.20m",26.4,63,3
+20,"Norwich City",38,5,7,26,23,84,-61,22,0.58,26836,"Teemu Pukki-11","Tim Krul","Relegated",22,NA,68634000,41472000,27162000,"<U+20AC>163.20m",24.7,57,1
+1,"Manchester City",38,28,7,3,96,34,62,91,2.39,53012,"Erling Haaland-27","Ederson","<U+2192> Champions League via league finish",24,NA,280368000,149904000,130464000,"<U+20AC>1.46bn",25.7,53,2
+2,"Arsenal FC",38,28,5,5,91,29,62,89,2.34,60236,"Bukayo Saka-16","David Raya","<U+2192> Champions League via league finish",24,NA,253908000,74736000,179172000,"<U+20AC>1.20bn",24.6,64,2
+3,"Liverpool FC",38,24,10,4,86,41,45,82,2.16,55979,"Mohamed Salah-18","Alisson","<U+2192> Champions League via league finish",24,NA,185760000,65556000,120204000,"<U+20AC>955.65m",24.2,69,5
+4,"Aston Villa",38,20,8,10,76,61,15,68,1.79,41858,"Ollie Watkins-19","Emiliano Mart<U+00ED>nez","<U+2192> Champions League via league finish",24,NA,120420000,35810640,84609360,"<U+20AC>709.65m",25,94,2
+5,"Tottenham Hotspur",38,20,6,12,74,61,13,66,1.74,61482,"Son Heung-min-17","Guglielmo Vicario","<U+2192> Europa League via league finish",24,NA,293868000,130356000,163512000,"<U+20AC>838.50m",25.6,92,4
+6,"Chelsea FC",38,18,9,11,77,63,14,63,1.66,39524,"Cole Palmer-22","<U+0110>or<U+0111>e Petrovi<U+0107>","<U+2192> Conference League via league finish",24,NA,483948000,304776000,179172000,"<U+20AC>1.01bn",22.2,108,4
+7,"Newcastle United",38,18,6,14,85,62,23,60,1.58,52125,"Alexander Isak-21","Martin D<U+00FA>bravka",NA,24,NA,1.62e+08,48168000,113832000,"<U+20AC>652.25m",26.3,79,1
+8,"Manchester United",38,18,6,14,57,58,-1,60,1.58,73533,"Rasmus H<U+00F8>jlund,Bruno Fernandes-10","Andr<U+00E9> Onana","<U+2192> Europa League via cup win",24,NA,227556000,68871600,158684400,"<U+20AC>808.35m",24.9,83,1
+9,"West Ham United",38,14,10,14,60,74,-14,52,1.37,62567,"Jarrod Bowen-16","Alphonse Areola",NA,24,NA,156114000,186688800,-30574800,"<U+20AC>487.50m",26.6,82,3
+10,"Crystal Palace",38,13,10,15,57,58,-1,49,1.29,24932,"Jean-Philippe Mateta-16","Sam Johnstone",NA,24,NA,73224000,0,73224000,"<U+20AC>446.58m",25.1,73,2
+11,"Brighton & Hove Albion",38,12,12,14,55,62,-7,48,1.26,32638,"Jo<U+00E3>o Pedro-9","Bart Verbruggen",NA,24,NA,115398000,204120000,-88722000,"<U+20AC>524.40m",24.2,90,3
+12,"AFC Bournemouth",38,13,9,16,54,67,-13,48,1.26,11103,"Dominic Solanke-19","Neto",NA,24,NA,140281200,1620000,138661200,"<U+20AC>401.75m",25.7,79,3
+13,"Fulham FC",38,13,8,17,55,61,-6,47,1.24,24302,"Rodrigo Muniz-9","Bernd Leno",NA,24,NA,79023600,57456000,21567600,"<U+20AC>384.35m",26.9,83,4
+14,"Wolverhampton Wanderers",38,13,7,18,50,65,-15,46,1.21,31029,"Hwang Hee-chan,Matheus Cunha-12","Jos<U+00E9> S<U+00E1>",NA,24,NA,101520000,182736000,-81216000,"<U+20AC>442.73m",23.9,102,4
+15,"Everton FC",38,13,9,16,40,51,-11,40,1.05,39042,"Abdoulaye Doucour<U+00E9>,Dominic Calvert-Lewin-7","Jordan Pickford","8-point deduction1",24,NA,43740000,89424000,-45684000,"<U+20AC>391.75m",26.8,82,1
+16,"Brentford FC",38,10,9,19,56,65,-9,39,1.03,17082,"Yoane Wissa-12","Mark Flekken",NA,24,NA,78138000,11070000,67068000,"<U+20AC>428.78m",25,89,2
+17,"Nottingham Forest",38,9,9,20,49,67,-18,32,0.84,29386,"Chris Wood-14","Matt Turner","4-point deduction2",24,NA,142160400,89445600,52714800,"<U+20AC>501.35m",26.6,82,3
+18,"Luton Town",38,6,8,24,52,85,-33,26,0.68,11240,"Carlton Morris-11","Thomas Kaminski","Relegated",24,NA,27972000,324000,27648000,"<U+20AC>140.90m",25.7,71,0
+19,"Burnley FC",38,5,9,24,41,78,-37,24,0.63,21184,"Jacob Bruun Larsen-6","James Trafford","Relegated",24,NA,119934000,4104000,115830000,"<U+20AC>273.48m",25.3,77,7
+20,"Sheffield United",38,3,7,28,35,104,-69,16,0.42,30011,"Oliver McBurnie,Ben Brereton-6","Wes Foderingham","Relegated",24,NA,72306000,33372000,38934000,"<U+20AC>152.35m",24.7,101,5
+1,"Liverpool FC",38,32,3,3,85,33,52,99,2.61,41955,"Mohamed Salah-19","Alisson","<U+2192> Champions League via league finish",20,NA,11232000,51840000,-40608000,"<U+20AC>1.00bn",23.8,38,1
+2,"Manchester City",38,26,3,9,102,35,67,81,2.13,37097,"Raheem Sterling-20","Ederson","<U+2192> Champions League via league finish",20,NA,183405600,76680000,106725600,"<U+20AC>1.05bn",25.4,64,4
+3,"Manchester United",38,18,12,8,66,36,30,66,1.74,57415,"Anthony Martial,Marcus Rashford-17","David de Gea","<U+2192> Champions League via league finish",20,NA,255744000,87674400,168069600,"<U+20AC>670.45m",24.4,73,0
+4,"Chelsea FC",38,20,6,12,69,54,15,66,1.74,32023,"Tammy Abraham-15","Kepa Arrizabalaga","<U+2192> Champions League via league finish",20,NA,48600000,178271280,-129671280,"<U+20AC>705.85m",24.7,60,0
+5,"Leicester City",38,18,8,12,67,41,26,62,1.63,25312,"Jamie Vardy-23","Kasper Schmeichel","<U+2192> Europa League via league finish",20,NA,112644000,95580000,17064000,"<U+20AC>411.10m",26.4,43,3
+6,"Tottenham Hotspur",38,16,11,11,61,47,14,59,1.55,43757,"Harry Kane-18","Hugo Lloris","<U+2192> Europa League via league finish1",20,NA,162540000,69660000,92880000,"<U+20AC>806.80m",25.3,84,3
+7,"Wolverhampton Wanderers",38,15,14,9,51,40,11,59,1.55,24758,"Ra<U+00FA>l Jim<U+00E9>nez-17","Rui Patr<U+00ED>cio",NA,20,NA,126036000,26028000,100008000,"<U+20AC>320.33m",23.6,61,2
+8,"Arsenal FC",38,14,14,10,56,48,8,56,1.47,47589,"Pierre-Emerick Aubameyang-22","Bernd Leno","<U+2192> Europa League via cup win2",20,NA,173664000,57942000,115722000,"<U+20AC>607.65m",24.8,88,5
+9,"Sheffield United",38,14,12,12,39,39,0,54,1.42,24370,"Lys Mousset,Oliver McBurnie-6","Dean Henderson",NA,20,NA,78300000,378000,77922000,"<U+20AC>138.60m",27.9,63,2
+10,"Burnley FC",38,15,9,14,43,50,-7,54,1.42,15995,"Chris Wood-14","Nick Pope",NA,20,NA,25758000,14634000,11124000,"<U+20AC>163.88m",26.8,67,0
+11,"Southampton FC",38,15,7,16,51,60,-9,52,1.37,23428,"Danny Ings-22","Alex McCarthy",NA,20,NA,66420000,29484000,36936000,"<U+20AC>210.75m",25,55,4
+12,"Everton FC",38,13,10,15,44,56,-12,49,1.29,28848,"Dominic Calvert-Lewin,Richarlison-13","Jordan Pickford",NA,20,NA,130680000,94824000,35856000,"<U+20AC>420.55m",26.5,76,3
+13,"Newcastle United",38,11,11,16,38,58,-20,44,1.16,35551,"Jonjo Shelvey-6","Martin D<U+00FA>bravka",NA,20,NA,78192000,38491200,39700800,"<U+20AC>252.48m",26.6,66,3
+14,"Crystal Palace",38,11,10,17,31,50,-19,43,1.13,19784,"Jordan Ayew-9","Vicente Guaita",NA,20,NA,8208000,59805000,-51597000,"<U+20AC>189.33m",27.4,62,2
+15,"Brighton & Hove Albion",38,9,14,15,39,54,-15,41,1.08,22369,"Neal Maupay-10","Mathew Ryan",NA,20,NA,66679200,9180000,57499200,"<U+20AC>200.78m",25.3,59,2
+16,"West Ham United",38,10,9,19,49,62,-13,39,1.03,44155,"Michail Antonio-10","<U+0141>ukasz Fabia<U+0144>ski",NA,20,NA,129384000,60188400,69195600,"<U+20AC>303.60m",27,64,1
+17,"Aston Villa",38,9,8,21,41,67,-26,35,0.92,28505,"Jack Grealish-8","Tom Heaton",NA,20,NA,172260000,3240000,169020000,"<U+20AC>231.70m",26.2,70,1
+18,"AFC Bournemouth",38,9,7,22,40,65,-25,34,0.89,7745,"Callum Wilson-8","Aaron Ramsdale","Relegated",20,NA,59302800,37395000,21907800,"<U+20AC>272.18m",25.4,78,3
+19,"Watford FC",38,8,10,20,36,64,-28,34,0.89,15353,"Troy Deeney-10","Ben Foster","Relegated",20,NA,60480000,31752000,28728000,"<U+20AC>199.60m",26.2,80,3
+20,"Norwich City",38,5,6,27,26,75,-49,21,0.55,19913,"Teemu Pukki-11","Tim Krul","Relegated",20,NA,9520200,2376000,7144200,"<U+20AC>145.33m",26,68,3
+1,"Manchester City",38,28,5,5,94,33,61,89,2.34,53249,"Erling Haaland-36","Ederson","<U+2192> Champions League via league finish",23,NA,167400000,175143600,-7743600,"<U+20AC>1.15bn",26,44,1
+2,"Arsenal FC",38,26,6,6,88,43,45,84,2.21,60191,"Martin <U+00D8>degaard,Gabriel Martinelli-15","Aaron Ramsdale","<U+2192> Champions League via league finish",23,NA,201312000,25704000,175608000,"<U+20AC>1.00bn",24,51,0
+3,"Manchester United",38,23,6,9,58,43,15,75,1.97,73671,"Marcus Rashford-17","David de Gea","<U+2192> Champions League via league finish",23,NA,262602000,25542000,237060000,"<U+20AC>847.75m",25.4,78,2
+4,"Newcastle United",38,19,14,5,68,33,35,71,1.87,52127,"Callum Wilson-18","Nick Pope","<U+2192> Champions League via league finish",23,NA,204228000,15181560,189046440,"<U+20AC>541.60m",28.3,61,1
+5,"Liverpool FC",38,19,10,9,75,47,28,67,1.76,53163,"Mohamed Salah-19","Alisson","<U+2192> Europa League via league finish",23,NA,152172000,86508000,65664000,"<U+20AC>811.85m",25.6,57,1
+6,"Brighton & Hove Albion",38,18,8,12,72,53,19,62,1.63,31477,"Alexis Mac Allister-10","Robert S<U+00E1>nchez","<U+2192> Europa League via league finish",23,NA,60156000,149472000,-89316000,"<U+20AC>529.80m",24.1,58,0
+7,"Aston Villa",38,18,7,13,51,46,5,61,1.61,41679,"Ollie Watkins-15","Emiliano Mart<U+00ED>nez","<U+2192> Conference League via league finish",23,NA,122040000,58320000,63720000,"<U+20AC>509.55m",25.4,80,1
+8,"Tottenham Hotspur",38,18,6,14,70,63,7,60,1.58,61585,"Harry Kane-30","Hugo Lloris",NA,23,NA,194292000,41850000,152442000,"<U+20AC>649.10m",25.9,77,3
+9,"Brentford FC",38,15,14,9,58,46,12,59,1.55,17078,"Ivan Toney-20","David Raya",NA,23,NA,53190000,3888000,49302000,"<U+20AC>371.20m",25.3,57,1
+10,"Fulham FC",38,15,7,16,55,53,2,52,1.37,23746,"Aleksandar Mitrovi<U+0107>-14","Bernd Leno",NA,23,NA,82188000,27432000,54756000,"<U+20AC>295.10m",25.9,80,1
+11,"Crystal Palace",38,11,12,15,40,49,-9,45,1.18,24952,"Eberechi Eze-10","Vicente Guaita",NA,23,NA,50328000,5896800,44431200,"<U+20AC>323.05m",25.4,82,3
+12,"Chelsea FC",38,11,11,16,38,47,-9,44,1.16,40002,"Kai Havertz-7","Kepa Arrizabalaga",NA,23,NA,680670000,73288800,607381200,"<U+20AC>994.95m",25.2,81,3
+13,"Wolverhampton Wanderers",38,11,8,19,31,58,-27,41,1.08,31482,"R<U+00FA>ben Neves,Daniel Podence-6","Jos<U+00E9> S<U+00E1>",NA,23,NA,193867560,70059600,123807960,"<U+20AC>497.65m",25.8,85,6
+14,"West Ham United",38,11,7,20,42,55,-13,40,1.05,62462,"Sa<U+00EF>d Benrahma,Jarrod Bowen-6","<U+0141>ukasz Fabia<U+0144>ski",NA,23,NA,212328000,23274000,189054000,"<U+20AC>465.60m",25.4,44,0
+15,"AFC Bournemouth",38,11,6,21,37,71,-34,39,1.03,10362,"Philip Billing-7","Neto",NA,23,NA,100872000,0,100872000,"<U+20AC>287.20m",25,68,0
+16,"Nottingham Forest",38,9,11,18,38,68,-30,38,1,29188,"Taiwo Awoniyi-10","Dean Henderson",NA,23,NA,214218000,5400000,208818000,"<U+20AC>376.25m",26.6,84,0
+17,"Everton FC",38,8,12,18,34,57,-23,36,0.95,39243,"Dwight McNeil-7","Jordan Pickford",NA,23,NA,89715600,111888000,-22172400,"<U+20AC>413.15m",26.9,81,2
+18,"Leicester City",38,9,7,22,51,68,-17,34,0.89,31887,"Harvey Barnes-13","Danny Ward","Relegated",23,NA,52920000,87912000,-34992000,"<U+20AC>490.70m",26.4,63,2
+19,"Leeds United",38,7,10,21,48,78,-30,31,0.82,36566,"Rodrigo-13","Illan Meslier","Relegated",23,NA,177001200,123660000,53341200,"<U+20AC>345.15m",24,89,3
+20,"Southampton FC",38,6,7,25,36,73,-37,25,0.66,30440,"James Ward-Prowse-9","Gavin Bazunu","Relegated",23,NA,166546800,5940000,160606800,"<U+20AC>419.95m",24.8,73,0
+1,"Liverpool FC",38,25,9,4,86,41,45,84,2.21,60324,"Mohamed Salah-29","Alisson","<U+2192> Champions League via league finish",25,NA,45360000,50760000,-5400000,"<U+20AC>950.95m",24.7,67,3
+2,"Arsenal FC",38,20,14,4,69,34,35,74,1.95,60251,"Kai Havertz-9","David Raya","<U+2192> Champions League via league finish",25,NA,116208000,90493200,25714800,"<U+20AC>1.16bn",24.5,70,6
+3,"Manchester City",38,21,8,9,72,44,28,71,1.87,52756,"Erling Haaland-22","Ederson","<U+2192> Champions League via league finish",25,NA,262440000,153036000,109404000,"<U+20AC>1.36bn",25.6,59,2
+4,"Chelsea FC",38,20,9,9,64,43,21,69,1.82,39672,"Cole Palmer-15","Robert S<U+00E1>nchez","<U+2192> Champions League via league finish",25,NA,304452000,256068000,48384000,"<U+20AC>1.19bn",22.4,101,2
+5,"Newcastle United",38,20,6,12,68,47,21,66,1.74,52187,"Alexander Isak-23","Nick Pope","<U+2192> Champions League via league finish",25,NA,73656000,96714000,-23058000,"<U+20AC>677.53m",27.5,68,1
+6,"Aston Villa",38,19,9,10,58,51,7,66,1.74,42079,"Ollie Watkins-16","Emiliano Mart<U+00ED>nez","<U+2192> Europa League via league finish",25,NA,231336000,277743600,-46407600,"<U+20AC>680.55m",25.2,76,4
+7,"Nottingham Forest",38,19,8,11,58,46,12,65,1.71,30059,"Chris Wood-20","Matz Sels","<U+2192> Conference League via league finish",25,NA,113940000,93636000,20304000,"<U+20AC>481.30m",26.8,90,2
+8,"Brighton & Hove Albion",38,16,13,9,66,59,7,61,1.61,31798,"Danny Welbeck,Kaoru Mitoma... -10","Bart Verbruggen",NA,25,NA,303966000,54799200,249166800,"<U+20AC>667.58m",24.2,78,3
+9,"AFC Bournemouth",38,15,11,12,58,46,12,56,1.47,11210,"Justin Kluivert-12","Kepa Arrizabalaga",NA,25,NA,148359600,71377200,76982400,"<U+20AC>518.60m",24.7,97,3
+10,"Brentford FC",38,16,8,14,66,57,9,56,1.47,18742,"Bryan Mbeumo-20","Mark Flekken",NA,25,NA,106272000,80460000,25812000,"<U+20AC>427.85m",24.4,62,1
+11,"Fulham FC",38,15,9,14,54,54,0,54,1.42,26826,"Ra<U+00FA>l Jim<U+00E9>nez-12","Bernd Leno",NA,25,NA,98874000,74304000,24570000,"<U+20AC>362.35m",27.7,80,2
+12,"Crystal Palace",38,13,14,11,51,51,0,53,1.39,25064,"Jean-Philippe Mateta-14","Dean Henderson","<U+2192> Europa League via cup win",25,NA,99252000,108756000,-9504000,"<U+20AC>526.85m",26.2,80,4
+13,"Everton FC",38,11,15,12,42,44,-2,48,1.26,38439,"Iliman Ndiaye-9","Jordan Pickford",NA,25,NA,54691200,90882000,-36190800,"<U+20AC>363.23m",25.8,82,2
+14,"West Ham United",38,11,10,17,46,62,-16,43,1.13,62463,"Jarrod Bowen-13","Alphonse Areola",NA,25,NA,155952000,49842000,106110000,"<U+20AC>400.70m",28,82,3
+15,"Manchester United",38,11,9,18,44,54,-10,42,1.11,73747,"Bruno Fernandes,Amad Diallo-8","Andr<U+00E9> Onana",NA,25,NA,266004000,126576000,139428000,"<U+20AC>825.00m",24,86,3
+16,"Wolverhampton Wanderers",38,12,6,20,54,69,-15,42,1.11,30695,"Matheus Cunha-15","Jos<U+00E9> S<U+00E1>",NA,25,NA,128952000,125496000,3456000,"<U+20AC>433.05m",25.3,79,2
+17,"Tottenham Hotspur",38,11,5,22,64,65,-1,38,1,61127,"Brennan Johnson-11","Guglielmo Vicario","<U+2192> Champions League",25,NA,200178000,60804000,139374000,"<U+20AC>777.30m",24,72,1
+18,"Leicester City",38,6,7,25,33,80,-47,25,0.66,31448,"Jamie Vardy-9","Mads Hermansen","Relegated",25,NA,98334000,51030000,47304000,"<U+20AC>253.35m",25.3,87,0
+19,"Ipswich Town",38,4,10,24,36,82,-46,22,0.58,29742,"Liam Delap-12","Arijanet Muric","Relegated",25,NA,164797200,2548800,162248400,"<U+20AC>270.10m",26.6,93,5
+20,"Southampton FC",38,2,6,30,26,86,-60,12,0.32,30882,"Paul Onuachu-4","Aaron Ramsdale","Relegated",25,NA,132894000,44917200,87976800,"<U+20AC>310.05m",25.3,89,3

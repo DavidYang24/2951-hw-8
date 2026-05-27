@@ -1,0 +1,935 @@
+---
+title: "What factors have the greatest impact on the performance in the Premier League, UK?"
+subtitle: "Report"
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-height: 3
+  fig-width: 5
+
+format:
+  pdf:
+    fontsize: 9pt
+    linestretch: 0.9
+    geometry:
+      - margin=0.65in
+---
+
+## Research question
+
+What factors have the greatest impact on the performance in the Premier League, UK? We will evaluate factors such as mean player age across positions, team spending and defensive discipline as a team.
+
+# DATA DESCRIPTION
+
+## Observations and Attributes
+
+This analysis uses multiple datasets that were merged into two main datasets: a team-season level dataset and a player-season level dataset covering the 2019/2020 through 2024/2025 Premier League seasons. The data came primarily from FbRef and Transfermarkt.
+
+The football performance and disciplinary data came from FbRef, specifically Premier League team tables, team statistics, and player statistics pages. FbRef provides match, table, team, and player-level statistics for each Premier League season, including league ranking, points, goals, assists, yellow cards, red cards, and player positions. For example, FbRef’s Premier League overview page includes tables, fixtures, player stats, team stats, and season-level information.
+
+The financial and squad-value data came from Transfermarkt, which provides football transfer, market value, squad, and club-level statistics. We used Transfermarkt data for variables such as transfer spending, transfer income, net transfer spending, squad market value, squad size, average squad age, and number of foreign players. Transfermarkt’s Premier League pages provide information on club market values and transfer income/expenditures by season.
+
+Source links used:
+
+-   FbRef Premier League overview and statistics:\
+    <https://fbref.com/en/comps/9/Premier-League-Stats>
+
+-   Transfermarkt Premier League income and expenditures:\
+    <https://www.transfermarkt.com/premier-league/einnahmenausgaben/wettbewerb/GB1>
+
+-   Transfermarkt Premier League club market values:\
+    <https://www.transfermarkt.com/premier-league/marktwerte/wettbewerb/GB1>
+
+-   Transfermarkt Premier League overview:\
+    <https://www.transfermarkt.com/premier-league/startseite/wettbewerb/GB1>
+
+### **Team-Season Level Dataset**
+
+The team-season level dataset is the main dataset used for analysis. Each observation represents one Premier League team in one season. For example, Arsenal in 2022/2023 would be one observation, while Arsenal in 2023/2024 would be a separate observation.
+
+The important variables include:
+
+-   **Performance Variables:**
+
+    -   **League Ranking**: A team’s final position in the Premier League table. The ranking ranges from 1 to 20, where 1 is the best (team finished first), and 20 is the worst (team finished last).
+
+    -   **Points:** The total number of points earned by a team during the season. In football, teams earn 3 points for a win, 1 point for a draw, and 0 points for a loss. Since Premier League teams play 38 matches, the theoretical range is 0 to 114 points, although actual values are usually much narrower.
+
+-   **Financial Variables**
+
+    -   **Transfer Spending:** The total amount of money a team spent buying players during a season. This was originally collected in euros from Transfermarkt and later converted into U.S. dollars for analysis.
+
+    -   **Transfer Income:** The total amount of money a team received from selling players during a season.
+
+    -   **Net Transfer Spending:** Transfer spending minus transfer income. A positive value means the team spent more on players than it earned from sales, while a negative value means the team earned more from sales than it spent.
+
+    -   **Squad Value:** The estimated total market value of a team’s players, based on Transfermarkt’s player valuations. In the analysis, this variable is measured in millions of euros.
+
+-   **Squad Level Variable(s)**
+
+    -   **Average Squad Age:** The average age of players in the squad, measured in years.
+
+-   **Disciplinary Variables**
+
+    -   **Yellow Cards:** The total number of yellow cards received by a team in a season. A yellow card is a warning for misconduct. Two yellow cards to the same player in one match result in a red card.
+
+    -   **Red Cards:** The total number of red cards received by a team in a season. A red card means a player is sent off and the team must continue the match with one fewer player.
+
+### **Player-Season Level Dataset**
+
+The player-season level dataset contains information at the individual player level. Each observation represents one player in one Premier League season.
+
+The important variables include:
+
+-   **Player Age:** The age of the player during the season, measured in years.
+
+-   **Team/Squad:** The Premier League club the player played for.
+
+-   **Position:** The player’s main role on the field. We grouped positions into broader categories:
+
+    -   **DF:** Defender, usually responsible for preventing the opposing team from scoring.
+    -   **MF:** Midfielder, usually responsible for linking defense and attack.
+    -   **FW:** Forward, usually responsible for attacking and scoring goals.
+
+-   **Yellow Cards:** The number of yellow cards received by the player during the season.
+
+-   **Red Cards:** The number of red cards received by the player during the season.
+
+For the disciplinary models, we focused on cards assigned to outfield position groups: defenders, midfielders, and forwards. Goalkeeper cards were present in the cleaned data but were not included in the main position-specific or aggregated card models.
+
+Because some players are listed under multiple positions, we split those players across their listed position categories when aggregating yellow and red cards by position. This allowed us to compare whether disciplinary behavior by defenders, midfielders, or forwards was associated with team performance.
+
+## Why was this dataset created?
+
+-   For sports analytics and reporting by clubs, media and fans. Data is designed to track player and team performance.
+
+## Who funded the creation of the dataset
+
+For Fbref, they are a part of Sports Reference LLC. From 2018 to 2023, their data comes from StatsBomb; in the recent 3 years, their data is provided by Opta, a part of Stat Perform. Their funding is mainly from private equities, and their revenue comes from subscription and API services for sports companies.
+
+Data constraints or things to know from Fbref - Basic Stats generally include goals scored, minutes, matches and cards. - Intermediate Stats will include basic statistical information like crosses, tackles won, shots, and interceptions at the player and team level. - Positional Data Since 2014-15, Player Position Data is constructed from season-level data. This means results may include players who may not have played a position regularly. Prior to 2014-15, Position data is based on career-level positional data.
+
+## What processes might have influenced what data was observed and recorded and what was not?
+
+Opta gets its data from both AI and human watching. Although it's professional, it may still lead to bias and errors as it's computed by humans in real time.
+
+## What pre-processing was done, and how did the data come to be in the form that you are using?
+
+-   Season formats were standardized by extracting the final two digits (e.g. "24_25" and "24-25" were converted to "25")
+
+-   Column names were standardized across datasets
+
+-   Separate datasets (performance, transfer spending, squad characteristics, and disciplinary records) were merged using team and season
+
+-   Team performance was measured using either total points or league position
+
+-   Financial variables were converted into consistent units and scaled to millions for interpretability.
+
+# DATA ANALYSIS
+
+```{r}
+#| label: load packages
+#| echo: false
+
+library(infer)
+library(tidyverse)
+library(httr2)
+library(jsonlite)
+library(readxl)
+library(stringr)
+library(readr)
+library(purrr)
+library(scales)
+library(broom)
+library(gt)
+```
+
+```{r}
+#| label: load-cleaned-data
+#| echo: false
+#| message: false
+#| warning: false
+
+team_season_data <- read_csv("data/analysis/team_season_data.csv")
+player_season_data <- read_csv("data/analysis/player_season_data.csv")
+
+```
+
+## Hypothesis 1: Disciplinary Behavior and Performance
+
+-   Teams that accumulate more disciplinary actions among defensive and midfield players (DF/MF) tend to be more aggressive or tactically disruptive, which may relate to performance outcomes. However, excessive disciplinary actions, especially red cards, negatively impact performance.
+
+### Data Cleaning and Processing
+
+The cleaned player-season and team-season datasets were created in Appendix A. In the report, we used these cleaned datasets to construct position-level disciplinary variables. For players listed under multiple positions, yellow and red cards were divided equally across listed positions before aggregating to the team-season-position level.
+
+```{r}
+#| label: create-discipline-analysis-objects
+#| echo: false
+#| message: false
+#| warning: false
+
+discipline_long <- player_season_data |>
+  mutate(
+    pos_count = str_count(Pos, ",") + 1,
+    CrdY = CrdY / pos_count,
+    CrdR = CrdR / pos_count
+  ) |>
+  separate_rows(Pos, sep = ",") |>
+  mutate(Pos = str_trim(Pos)) |>
+  group_by(Squad, Season, Pos) |>
+  summarise(
+    yellow = sum(CrdY, na.rm = TRUE),
+    red = sum(CrdR, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+discipline_wide <- discipline_long |>
+  pivot_wider(
+    names_from = Pos,
+    values_from = c(yellow, red),
+    values_fill = 0
+  )
+
+analysis_df_cards <- discipline_wide |>
+  left_join(
+    team_season_data |>
+      select(
+        Squad,
+        Season,
+        Rk,
+        MP,
+        W,
+        D,
+        L,
+        GF,
+        GA,
+        GD,
+        Pts,
+        `Pts/MP`,
+        Attendance
+      ),
+    by = c("Squad", "Season")
+  )
+
+long_df <- discipline_long |>
+  left_join(
+    team_season_data |>
+      select(
+        Squad,
+        Season,
+        Rk,
+        MP,
+        W,
+        D,
+        L,
+        GF,
+        GA,
+        GD,
+        Pts,
+        `Pts/MP`,
+        Attendance
+      ),
+    by = c("Squad", "Season")
+  )
+```
+
+### Regression Model: Cards by position
+
+To test whether disciplinary behavior by position predicts team points, a multiple linear regression was estimated with yellow and red cards for defenders, midfielders, and forwards as predictors. Table 1 presents the model coefficients.
+
+```{r}
+#| echo: false
+#| label: tbl-regression-results_1
+#| tbl-cap: "Card coefficients from multiple linear regression model"
+
+mod_cards <- lm(
+  Pts ~ yellow_DF + yellow_MF + yellow_FW + red_DF + red_MF + red_FW,
+  data = analysis_df_cards
+)
+tidy(mod_cards) |>
+  left_join(
+    tidy(mod_cards, conf.int = TRUE) |> select(term, conf.low, conf.high),
+    by = "term"
+  ) |>
+  mutate(
+    term = c(
+      "Intercept",
+      "Yellow/Defenders",
+      "Yellow/Midfielders",
+      "Yellow/Forwards",
+      "Red/Defenders",
+      "Red/Midfielders",
+      "Red/Forwards"
+    )
+  ) |>
+  rename(
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `t-value` = statistic,
+    `p-value` = p.value,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(
+      Estimate,
+      `Std. Error`,
+      `t-value`,
+      `p-value`,
+      `Lower CI`,
+      `Upper CI`
+    ),
+    decimals = 2
+  )
+```
+
+**Model** $R^2=0.1646$; Adjusted $R^2=0.1203$
+
+As shown in Table 1, Yellow cards received by midfielders are the only statistically significant predictor ($\beta = -0.57$, p \< 0.01), suggesting that for every additional card a midfielder accumulates, a team loses just over half a point on average. Defender yellow cards trend in the same negative direction ($\beta$ = −0.37) but fall short of significance (p = 0.14), while forward yellow cards show no association ($\beta$ = 0.01, p = 0.98). Red cards are non-significant across all positions, which could be expected for two reasons: red cards are rare events, and splitting them by position further reduces the per-cell counts, diluting statistical power. Notably, the confidence intervals for red card coefficients are extremely wide reflecting this high uncertainty. The overall model explains approximately 16.5% of the variance in points ($R^2 \approx$ 0.165), which is modest. This suggests that positional card data alone is insufficient to account for what drives Premier League team performance.
+
+### Aggregated Cards model
+
+Given the limited explanatory power of the position-level model, two simpler models were estimated using total yellow and total red cards counts across all outfield positions. This aggregation recovers statistical power lost through position division.
+
+```{r}
+#| echo: false
+#| label: tbl-regression-results_2
+#| tbl-cap: "Card coefficients from aggregated cards model"
+analysis_df_cards <- analysis_df_cards |>
+  mutate(
+    total_yellow = yellow_DF + yellow_MF + yellow_FW,
+    total_reds = red_DF + red_MF + red_FW
+  )
+
+mod_yellow <- lm(Pts ~ total_yellow, data = analysis_df_cards)
+mod_red <- lm(Pts ~ total_reds, data = analysis_df_cards)
+
+bind_rows(
+  tidy(mod_yellow, conf.int = TRUE) |> mutate(model = "Yellow Cards"),
+  tidy(mod_red, conf.int = TRUE) |> mutate(model = "Red Cards")
+) |>
+  filter(term != "(Intercept)") |>
+  mutate(
+    r_squared = c(summary(mod_yellow)$r.squared, summary(mod_red)$r.squared),
+    term = c("Total Yellow", "Total Red")
+  ) |>
+  rename(
+    Model = model,
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `t-value` = statistic,
+    `p-value` = p.value,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high,
+    `R^2` = r_squared
+  ) |>
+  select(
+    Model,
+    Predictor,
+    Estimate,
+    `Std. Error`,
+    `p-value`,
+    `Lower CI`,
+    `Upper CI`,
+    `R^2`
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(
+      Estimate,
+      `Std. Error`,
+      `p-value`,
+      `Lower CI`,
+      `Upper CI`,
+      `R^2`
+    ),
+    decimals = 3
+  )
+
+```
+
+As shown in table 2, the aggregated yellow card model confirms a negative association with points: each additional yellow card accumulated across the squad is associated with a decrease of 0.46 points, and this effect is highly significant (p \< 0.001). This backs up the finding from the positional model over midfielders effect, and extends it to the team as a whole. Total red cards also show a negative and statistically significant association (p = 0.027), with each additional red card linked to a 2.41 point reduction; larger coefficient than for yellow cards, which could be expected given the immediate match impact of a red cards. That said, red cards are rare events and the confidence interval is wide (−4.53 to −0.28), so this estimate carries more uncertainty. Comparing the two models, yellow cards explain more variance in team points ($R^2$ = 0.136) than red cards ($R^2$ = 0.041), suggesting that the cumulative obtention of yellow cards across a season is a more consistent predictor of underperformance than the occurrence of red cards. However, both models account for a small portion of variance, reinforcing the idea that disciplinary behavior alone is not a primary predictor of Premier League performance.
+
+### Fixed Effect model
+
+To account for systematic differences between clubs, such as the fact that top teams tend to accumulate fewer cards and more points regardless of discipline; team fixed effects were introduced by adding a dummy variable for each squad. This allows the card coefficients to capture within-team variation across seasons.
+
+```{r}
+#| echo: false
+#| label: tbl-regression-results_3
+#| tbl-cap: "Card coefficients from fixed effects model (team dummies included)"
+mod_cards_fe <- lm(
+  Pts ~ yellow_DF +
+    yellow_MF +
+    yellow_FW +
+    red_DF +
+    red_MF +
+    red_FW +
+    factor(Squad),
+  data = analysis_df_cards
+)
+
+tidy(mod_cards_fe, conf.int = TRUE) |>
+  filter(!str_starts(term, "factor")) |>
+  filter(term != "(Intercept)") |>
+  mutate(
+    term = c(
+      "Yellow/Defenders",
+      "Yellow/Midfielders",
+      "Yellow/Forwards",
+      "Red/Defenders",
+      "Red/Midfielders",
+      "Red/Forwards"
+    )
+  ) |>
+  rename(
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `t-value` = statistic,
+    `p-value` = p.value,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(
+      Estimate,
+      `Std. Error`,
+      `t-value`,
+      `p-value`,
+      `Lower CI`,
+      `Upper CI`
+    ),
+    decimals = 3
+  )
+
+```
+
+As shown in table 3, once team identity is controlled for, none of the card variables retain statistical significance. Midfielder yellow cards, which were the sole significant predictor in the baseline model ($\beta = −0.57$), reduce considerably ($\beta$ = −0.24, p = 0.149), and all other coefficients similarly shrink toward zero. This suggests that the original association between midfielder faults and lower points was partly capturing the fact that weaker teams both play more aggressively and finish lower, rather than discipline itself causing worse outcomes. The model fit improves substantially, as $R^2$ rises from 0.165 to 0.719, though the adjusted $R^2$ (0.616) reflects the cost of adding 19 team dummies. In short, who a team is explains far more of the variance in points than how many cards they receive, reinforcing the conclusion that disciplinary behavior is not a primary performance driver in the Premier League.
+
+## Hypothesis 2: Spending and Squad Characteristics
+
+In this hypothesis, we want to examine how transfer spending, squad age, and squad value will influence team performance, with higher spending and younger squads expected to be associated with better outcomes, controlling for overall squad value.
+
+-   $H_0$: Transfer spending, squad age, and squad value have no effect on performance
+-   $H_A$: At least one of these variables significantly affects performance
+
+### Data Cleaning and Merging
+
+The cleaned team-season dataset was created in Appendix A by merging FBref team performance data with Transfermarkt transfer and squad-value data. In this section, we derived a regression-ready dataset from that cleaned file by scaling transfer spending and squad value to millions.
+
+```{r}
+#| label: create-spending-analysis-data
+#| echo: false
+#| message: false
+#| warning: false
+
+analysis_df <- team_season_data |>
+  transmute(
+    Squad,
+    Season,
+    ranking = Rk,
+    Pts,
+    transfer_spending = spend_usd / 1e6,
+    income = income_usd / 1e6,
+    net_spend = net_spend_usd / 1e6,
+    squad_age = avg_age,
+    squad_value = squad_value_eur / 1e6
+  ) |>
+  drop_na(ranking, transfer_spending, squad_age, squad_value)
+```
+
+### Visualizations
+
+After constructing the analysis-ready dataset, we first use visualizations to examine the relationships between the predictors and league ranking.. We will use scatter plots with linear regression lines to visualize these relationships. In this case, it will set up a good foundation for our regression analysis and help us understand the direction and strength of these relationships.
+
+```{r}
+#| echo: false
+#| label: spending-plot
+#| fig-width: 5
+#| fig-height: 3
+#| out-width: "70%"
+
+ggplot(analysis_df, aes(x = transfer_spending, y = ranking)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 1: Transfer Spending and League Ranking",
+    x = "Transfer Spending/million",
+    y = "League Ranking (lower is better)"
+  )
+```
+
+Figure 1 suggests a weak negative bivariate relationship between transfer spending and league ranking, meaning higher-spending teams sometimes finish higher in the table because lower ranking numbers indicate better performance. However, the relationship is scattered, suggesting that spending alone does not explain performance. This is important because the later multiple regression controls for squad value and squad age, allowing us to test whether spending still matters after accounting for broader squad quality.
+
+```{r}
+#| echo: false
+#| label: age-plot
+#| fig-width: 5
+#| fig-height: 3
+#| out-width: "70%"
+
+ggplot(analysis_df, aes(x = squad_age, y = ranking)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 2: Squad Age and League Ranking",
+    x = "Average Squad Age",
+    y = "League Ranking (lower is better)"
+  )
+```
+
+Based on this graph, we can see a slightly positive effect with squad age and ranking. This means that the team with higher average age will have a larger number in ranking, which means their ranking is low and their performance is worse. However, since the graph is quite scattered and the regression line is not much slope, it suggests that there is no strong relationship between squad age and performance. This could be because while older squads may have more experience, they may also suffer from physical decline, and younger squads may have more energy but less experience. So overall, squad age does not seem to be a significant predictor of league ranking in this dataset. However, this needs to be further tested by the regression analysis.
+
+```{r}
+#| echo: false
+#| label: value-plot
+#| fig-width: 5
+#| fig-height: 3
+#| out-width: "70%"
+
+ggplot(analysis_df, aes(x = squad_value, y = ranking)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 3: Squad Value and League Ranking",
+    x = "Squad Value/million",
+    y = "League Ranking (lower is better)"
+  )
+```
+
+Lastly, based on the graph, we can see a strong correlation between squad value and team performance. Teams with higher squad value tend to have better rankings (lower ranking number), which suggests that investing in a more valuable squad is associated with improved performance in the Premier League. The graph shows a clear downward slope, indicating that as squad value increases, league ranking improves. This relationship appears stronger than the one observed with transfer spending or squad age, suggesting that overall squad quality (as proxied by market value) may be a more important factor in determining league performance than just spending or age alone.
+
+### Regression Model
+
+```{r}
+#| echo: false
+#| label: tbl-regression-results-4
+#| tbl-cap: "Coefficients from financial investment and squad model"
+#| results: asis
+
+mod <- lm(
+  ranking ~ transfer_spending + squad_age + squad_value,
+  data = analysis_df
+)
+
+tbl <- tidy(mod, conf.int = TRUE) |>
+  filter(term != "(Intercept)") |>
+  mutate(
+    term = recode(
+      term,
+      transfer_spending = "Transfer Spending",
+      squad_age = "Squad Age",
+      squad_value = "Squad Value"
+    )
+  ) |>
+  rename(
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `t-value` = statistic,
+    `p-value` = p.value,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high
+  ) |>
+  gt()
+
+tbl
+```
+
+As shown in table 4, in this model, we run a multiple linear regression using `lm()`. the goal is to examine how financial investment and squad characteristics affect team performance. The dependent variable is league ranking.
+
+Variables in the Model: - Transfer Spending: total spending (in millions USD) - Squad Age: average age of the team\
+- Squad Value: total market value (in millions EUR)
+
+The regression results show that squad value is the most strongest and most statistically reliable predictor of team performance, with a negative coefficient (-0.0178, p \< 0.001), indicating that higher squad value is associated with a lower (better) ranking. Transfer spending is also statistically significant (0.0140, p \< 0.01), but its positive coefficient suggests that higher spending is linked to worse performance, which may reflect inefficient spending or the tendency of weaker teams to spend more in an attempt to improve. Squad age has a negative but insignificant effect (-0.343, p = 0.27), indicating no strong evidence that age impacts performance. Overall, the model explains about 63% of the variation in rankings (R² = 0.63) and is statistically significant, suggesting that while squad value plays a key role, performance is also influenced by other factors such as tactics, coaching, and efficiency.
+
+### Multicollinearity Check
+
+To make sure our analysis is accurate and check whether the predictors are too highly correlated with each other, we will run a multicollinearity check to our variables.
+
+```{r}
+#| echo: false
+#| label: tbl-regression-results_5
+#| tbl-cap: "Multicollinearity Check: Correlation Matrix for Transfer Spending, Squad Age, and Squad Value"
+
+analysis_df |>
+  select(transfer_spending, squad_age, squad_value) |>
+  cor(use = "complete.obs") |>
+  as.data.frame() |>
+  tibble::rownames_to_column("Variable") |>
+  pivot_longer(
+    -Variable,
+    names_to = "Compared With",
+    values_to = "Correlation"
+  ) |>
+  mutate(
+    Variable = recode(
+      Variable,
+      transfer_spending = "Transfer Spending",
+      squad_age = "Squad Age",
+      squad_value = "Squad Value"
+    ),
+    `Compared With` = recode(
+      `Compared With`,
+      transfer_spending = "Transfer Spending",
+      squad_age = "Squad Age",
+      squad_value = "Squad Value"
+    )
+  ) |>
+  gt() |>
+  fmt_number(columns = Correlation, decimals = 3)
+```
+
+As shown in table 5, the correlation matrix shows moderate relationships among the variables, with no serious multicollinearity concerns. Transfer spending and squad value are positively correlated (0.59), indicating that wealthier teams tend to spend more. Squad age is negatively correlated with both spending (-0.29) and value (-0.40), suggesting younger squads are often more valuable and invest more. Since all correlations are below common concern thresholds (around 0.7), multicollinearity is unlikely to significantly affect the regression results.
+
+# EVALUATION OF SIGNIFICANCE
+
+## Hypothesis 1: Disciplinary Behavior
+
+### Permutation test and bootstrap evaluation
+
+```{r}
+#| label: permutation-test
+#| echo: false
+
+set.seed(100)
+
+obs_coeff <- mod_cards |>
+  tidy() |>
+  filter(term == "yellow_DF") |>
+  pull(estimate)
+
+perm_results <- analysis_df_cards |>
+  specify(Pts ~ yellow_DF) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
+  calculate(stat = "slope")
+
+p_val_perm <- perm_results |>
+  get_p_value(obs_stat = obs_coeff, direction = "two-sided")
+
+# Permutation distribution for R^2
+obs_r2 <- summary(mod_cards)$r.squared
+
+null_r2 <- numeric(1000)
+
+for (i in 1:1000) {
+  shuffled_pts <- sample(analysis_df_cards$Pts)
+  perm_mod <- lm(
+    shuffled_pts ~ yellow_DF + yellow_MF + yellow_FW + red_DF + red_MF + red_FW,
+    data = analysis_df_cards
+  )
+  null_r2[i] <- summary(perm_mod)$r.squared
+}
+
+p_val_r2 <- mean(null_r2 >= obs_r2)
+
+perm_results |>
+  visualize() +
+  shade_p_value(obs_stat = obs_coeff, direction = "two-sided") +
+  labs(
+    title = "Figure 4: Permutation Test: Yellow-DF card coefficient",
+    subtitle = "Shaded region = values as extreme as observed under the null",
+    x = "Coefficient value under null hypothesis",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#| label: bootstraping
+#| echo: false
+
+obs_coeff <- mod_cards |>
+  tidy() |>
+  filter(term == "yellow_DF") |>
+  pull(estimate)
+
+boot_results <- analysis_df_cards |>
+  specify(Pts ~ yellow_DF) |>
+  generate(reps = 1000, type = "bootstrap") |>
+  calculate(stat = "slope")
+
+boot_ci <- boot_results |>
+  get_confidence_interval(level = 0.95, type = "percentile")
+
+```
+
+To complement the parametric regression results and assess their significance, a permutation test and a bootstrap were applied to the positional card model. The hypothesis proposed that yellow cards among defenders could reflect a protective tactical strategy and positively affect performance ($\beta > 0$), while red cards were expected to always hurt performance. To test the yellow card claim, a two-tailed permutation test was used for the defender yellow card coefficient, since the hypothesis predicts a positive direction; the null is therefore that there is no effect in either direction (independence), and a two-tailed test does not pre-commit to the predicted sign. The observed coefficient ($\beta = −0.37$) yielded a permutation p-value of 0.175, meaning a result this extreme arises roughly 17.5% of the time under pure randomness, failing to reject the null hypothesis. More importantly, the coefficient is negative, which directly contradicts the prediction that defensive faults benefit performance.
+
+The bootstrap distribution of the defender yellow card coefficient reinforces this. The distribution is centered at -0.4 and crosses 0, suggesting that the effect is directionally unstable. Showing that this is not evidence of a beneficial effect, but instead of no reliable effect at all. Making the hypothesis for yellow cards unsupported.
+
+For overall model fit, a one-tailed permutation test on $R^2$ is appropriate, since a model can only explain more variance than chance, and not less. The observed $R^2$ of 0.165 exceeded all permuted values (p = 0.001), confirming that the model as a whole captures a real signal. This does not validate the hypothesis, but it does confirm the analysis is not built on noise.
+
+### Aggregated Models Significance
+
+#### Yellow Cards Analysis
+
+```{r}
+#| echo: false
+#| label: tbl-regression-another
+#| tbl-cap: "Aggregated Yellow Cards Model"
+
+tidy(mod_yellow, conf.int = TRUE) |>
+  filter(term != "(Intercept)") |>
+  mutate(
+    term = "Total Yellow Cards",
+    r_squared = summary(mod_yellow)$r.squared
+  ) |>
+  rename(
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `p-value` = p.value,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high,
+    `R^2` = r_squared
+  ) |>
+  select(
+    Predictor,
+    Estimate,
+    `Std. Error`,
+    `p-value`,
+    `Lower CI`,
+    `Upper CI`,
+    `R^2`
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(
+      Estimate,
+      `Std. Error`,
+      `p-value`,
+      `Lower CI`,
+      `Upper CI`,
+      `R^2`
+    ),
+    decimals = 3
+  )
+```
+
+As shown in Table 6, aggregating yellow cards across all positions, the model estimates that each additional booking costs a team 0.46 points on average ($\beta$ = −0.46, p \< 0.001, two-tailed). The result clearly rejects the null (independence), but in the wrong direction for the hypothesis, as yellow card accumulation is associated with worse performance, not better. The model explains 13.6% of variance in points (R² = 0.136), indicating a real but limited effect.
+
+#### Red Cards Analysis
+
+-   $H_0$: There is no relationship between red cards and points ($\beta_{red} = 0$).
+-   $H_a$: Red cards have a negative impact on points ($\beta_{red} < 0$).
+
+```{r}
+#| label: all-red-cards
+#| echo: false
+
+t_stat <- summary(mod_red)$coefficients["total_reds", "t value"]
+p_val_one_tailed <- pt(t_stat, df = mod_red$df.residual, lower.tail = TRUE)
+
+```
+
+```{r}
+#| label: tbl-red-aggregated
+#| tbl-cap: "Aggregated Red Cards Model"
+#| echo: false
+
+t_stat <- summary(mod_red)$coefficients["total_reds", "t value"]
+p_val_one_tailed <- pt(t_stat, df = mod_red$df.residual, lower.tail = TRUE)
+
+tidy(mod_red, conf.int = TRUE) |>
+  filter(term != "(Intercept)") |>
+  mutate(
+    term = "Total Red Cards",
+    `p-value (one-tailed)` = p_val_one_tailed,
+    `p-value (two-tailed)` = p.value,
+    r_squared = summary(mod_red)$r.squared
+  ) |>
+  rename(
+    Predictor = term,
+    Estimate = estimate,
+    `Std. Error` = std.error,
+    `Lower CI` = conf.low,
+    `Upper CI` = conf.high,
+    `R^2` = r_squared
+  ) |>
+  select(
+    Predictor,
+    Estimate,
+    `Std. Error`,
+    `p-value (one-tailed)`,
+    `p-value (two-tailed)`,
+    `Lower CI`,
+    `Upper CI`,
+    `R^2`
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(
+      Estimate,
+      `Std. Error`,
+      `p-value (one-tailed)`,
+      `p-value (two-tailed)`,
+      `Lower CI`,
+      `Upper CI`,
+      `R^2`
+    ),
+    decimals = 3
+  )
+
+```
+
+For red cards the hypothesis is directional, as red cards reduce a team to ten men and are therefore expected to decrease performance ($\beta$ \< 0). This justifies a one-tailed test. The observed coefficient ($\beta$ = −2.41) is in the predicted direction, and the one-tailed p-value is 0.013, which allows us to reject the null. For completeness, the two-tailed p-value is 0.027, which also remains significant and is the more conservative figure to report.
+
+Each red card is associated with a reduction of approximately 2.4 points, a considerably larger per-unit effect than yellow cards, which aligns with the direct cost of playing with one less player. That said, the model explains only 4.1% of variance in points ($R^2$ = 0.041), and the confidence interval is wide (−4.53 to −0.28), reflecting how unsual red card events are.
+
+### Significance Visualizations
+
+```{r}
+#| label: visualize-test
+
+ggplot(tibble(null_r2), aes(x = null_r2)) +
+  geom_histogram(fill = "skyblue", color = "white") +
+  geom_vline(xintercept = obs_r2, color = "red", size = 1.5) +
+  labs(
+    title = "Figure 5: Permutation Test: Model performance (R^2)",
+    subtitle = paste("Actual R²:", round(obs_r2, 3), "| P-value:", p_val_r2)
+  )
+```
+
+```{r}
+#| label: distribution-yellow-DF
+#| eval: false
+#| echo: false
+
+ggplot(boot_results, aes(x = stat)) +
+  geom_density(fill = "orange", alpha = 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Figure 6: Bootstrapped Distribution of Defender Yellow Card Coefficient",
+    x = "Coefficient Estimate",
+    y = "Density"
+  )
+```
+
+## Hypothesis 2
+
+# t-test
+
+```{r}
+#| label: tbl-regression-results_6
+#| tbl-cap: "Coefficients and t-values for financial and squad model"
+coef_tbl <- tidy(mod) |>
+  mutate(
+    term = recode(
+      term,
+      `(Intercept)` = "Intercept",
+      transfer_spending = "Transfer Spending",
+      squad_age = "Squad Age",
+      squad_value = "Squad Value"
+    )
+  ) |>
+  select(
+    Predictor = term,
+    Coefficient = estimate,
+    `t-value` = statistic
+  )
+
+model_stats <- glance(mod)
+
+coef_tbl |>
+  gt() |>
+  fmt_number(
+    columns = c(Coefficient, `t-value`),
+    decimals = 3
+  ) |>
+  tab_source_note(
+    source_note = paste0(
+      "F-statistic = ",
+      round(model_stats$statistic, 2),
+      ", p-value < 0.001"
+    )
+  )
+
+```
+
+As shown in table 8, the t-tests evaluate whether each variable has a statistically significant effect on team performance (ranking), holding other variables constant.
+
+-   Squad Value (β = -0.0178, p \< 0.001): Highly significant. A higher squad value is associated with a lower (better) ranking. This is the strongest predictor of performance.
+-   Transfer Spending (β = 0.0140, p = 0.0017): Statistically significant. However, the positive coefficient suggests higher spending is linked to worse ranking, possibly reflecting inefficient spending or weaker teams spending more to improve.
+-   Squad Age (β = -0.343, p = 0.268): Not statistically significant. There is no strong evidence that average squad age affects performance.
+
+Conclusion: We reject the null hypothesis for squad value and transfer spending, but fail to reject it for squad age.
+
+# f-test
+
+The model-level F-test reported below Table 8 evaluates whether the model as a whole has explanatory power.
+
+F-statistic = 65.71, p \< 2.2e-16
+
+This extremely small p-value indicates that the model is highly statistically significant, meaning:
+
+-   At least one independent variable significantly affects team performance
+-   The model provides a meaningful explanation of variation in rankings
+
+Conclusion: We reject the overall null hypothesis and support H_A: team performance is significantly influenced by financial and squad characteristics
+
+# Confidence Intervals
+
+```{r}
+#| label: tbl-regression-results_7
+#| tbl-cap: "95% Confidence Intervals for Regression Coefficients"
+confint(mod) |>
+  as.data.frame() |>
+  rownames_to_column("term") |>
+  mutate(
+    term = recode(
+      term,
+      `(Intercept)` = "Intercept",
+      transfer_spending = "Transfer Spending",
+      squad_age = "Squad Age",
+      squad_value = "Squad Value"
+    )
+  ) |>
+  rename(
+    Predictor = term,
+    `Lower CI (2.5%)` = `2.5 %`,
+    `Upper CI (97.5%)` = `97.5 %`
+  ) |>
+  gt() |>
+  fmt_number(
+    columns = c(`Lower CI (2.5%)`, `Upper CI (97.5%)`),
+    decimals = 3
+  )
+```
+
+As shown in table 9, the confidence intervals show that squad value has a strong and significant negative effect on ranking (better performance), while transfer spending is also significant but positively related to worse rankings, suggesting possible inefficiency. Squad age is not significant since its interval includes zero. Overall, squad value is the clearest reliable predictor in the expected direction. Transfer spending is also statistically significant, but because its coefficient is positive, it does not support the original expectation that higher spending directly improves league ranking.
+
+# INTERPRETATIONS AND CONCLUSION
+
+Over the course of our analysis, we found that both disciplinary behavior and squad-related financial factors are associated with Premier League performance, but they differ greatly in strength and practical importance. Disciplinary behavior was related to performance in the simpler models, especially when yellow and red cards were aggregated at the team level. Teams with more yellow cards tended to earn fewer points, and teams with more red cards also tended to perform worse. However, our confidence in discipline as an independent predictor is limited because these effects weakened after controlling for team identity. This suggests that discipline may matter at the margins, especially in close matches, but it does not explain most differences between successful and unsuccessful teams over a full season.
+
+For Hypothesis 1, the strongest initial evidence came from the aggregated card models rather than the position-specific models. The position-specific results were less stable, especially for red cards, likely because red cards are relatively rare and become harder to interpret when divided by player position. Aggregating cards across the whole team produced clearer evidence that disciplinary behavior is negatively related to points. Total yellow cards and total red cards were both associated with fewer points. However, the fixed effects model makes us more cautious about this conclusion. Once team identity was controlled for, none of the card variables remained statistically significant, and the midfielder yellow card effect that appeared in the baseline model became smaller and non-significant. This suggests that some of the original relationship between cards and performance may reflect differences between clubs rather than the direct effect of discipline itself. In other words, weaker teams may both receive more cards and earn fewer points, while stronger teams may have structural advantages that lead to both fewer cards and better results.
+
+For Hypothesis 2, we found stronger evidence that financial and squad-related characteristics are connected to performance. The multiple regression model explained about 63% of the variation in league ranking, which gives us more confidence that these variables capture important differences between teams. Squad value was the clearest predictor: teams with higher total squad value tended to finish higher in the league table. This finding makes sense in the real-world context of the Premier League because squad value likely reflects player quality, squad depth, experience, and long-term investment.
+
+However, transfer spending did not support our original expectation in a straightforward way. Higher transfer spending was associated with worse league ranking after controlling for squad value and squad age. This does not necessarily mean spending causes poor performance. A more realistic interpretation is that spending is often reactive: teams that are already struggling may spend more to fix weaknesses, while stronger teams may already have valuable squads and do not need to spend as heavily in a single transfer window. Average squad age was not statistically significant, so we do not have strong evidence that simply having a younger or older squad meaningfully predicts league ranking once spending and squad value are included.
+
+In practical terms, these results suggest that Premier League teams should be careful about relying on short-term transfer spending as a solution to poor performance. The more important factor appears to be the overall value and quality of the squad. For clubs, this means that long-term recruitment, player development, squad depth, and efficient spending may matter more than simply spending large amounts in one season. At the same time, teams should still manage disciplinary behavior because yellow and red cards are controllable risks. Avoiding unnecessary cards may not transform a season by itself, but it can prevent avoidable disadvantages in close matches.
+
+Our findings therefore partially support our original hypotheses, but they also refine them: successful teams are not simply the teams that spend more or have younger players, but the teams that convert financial resources into strong, valuable, and balanced squads.
+
+# LIMITATIONS
+
+-   The models do not include factors like injuries, manager quality, tactics, squad depth, or schedule difficulty, all of which could have a significant impact on performance.
+
+-   The analysis is also done at the team-season level, which may hide important variation within seasons.
+
+-   Differences in data sources and merging processes could introduce some measurement error.
+
+# ACKNOWLEDGEMENTS
+
+We want to specially thank our professor Dr. Soltoff for his guidance and support throughout this project. We also want to thank our TA for their feedback and suggestions during the peer review process. Then, we want to acknowledge the data providers (FBref and Transfermarkt) for making this analysis possible. We also acknowledge the R packages used in this project, which made the data cleaning, visualization, and modeling process possible.. It was a great experience learning INFO 2951, thank you professor and TA again!

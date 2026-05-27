@@ -1,0 +1,232 @@
+---
+title: "What factors have the greatest impact on the performance in the Premier League, UK?"
+subtitle: "Appendix to report"
+execute:
+  echo: true
+---
+
+# Data cleaning
+
+## Overview
+
+This appendix describes the cleaning process used to transform the raw FBref and Transfermarkt data into the analysis-ready datasets used in the final report. The final project uses two main types of data: a team-season dataset and a player-season dataset.
+
+The team-season dataset contains one row for each Premier League club in each season. It combines team performance, transfer spending, squad value, average squad age, and disciplinary totals. This dataset was used for the models analyzing the relationship between performance, spending, squad characteristics, and discipline.
+
+The player-season dataset contains individual player observations by season. It was used to clean and summarize age, position, playing time, and card information. We also created a position-level disciplinary dataset from the player-level FBref files to analyze yellow and red cards by team, season, and player position.
+
+All FBref performance and disciplinary data were manually exported as CSV or Excel files. Transfermarkt data was used for financial and squad-value variables.
+
+### Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(stringr)
+library(readr)
+library(purrr)
+library(scales)
+```
+
+### File Paths
+
+```{r}
+#| label: define-file-paths
+#| message: false
+#| warning: false
+
+players_dataset <- c(
+  "data/Question 3/players_overall_2019-2020.csv",
+  "data/Question 3/players_overall_2020-2021.csv",
+  "data/Question 3/players_overall_2021-2022.csv",
+  "data/Question 3/players_overall_2022-2023.csv",
+  "data/Question 3/players_overall_2023-2024.csv",
+  "data/Question 3/players_overall_2024-2025.csv"
+)
+
+pl_performance <- read_csv(
+  "data/Question 2/FBRef Data/premier_league_fbref_combined_2014_2026.csv"
+)
+
+pl_squad_values <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_squad_values_2014_2026.csv"
+)
+
+pl_transfer_spending <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_transfer_summaries_2014_2026.csv"
+)
+```
+
+We first listed the raw files used in the project. The FBref player and team files were stored separately by season, so we created vectors of file paths that could be processed with the same cleaning functions.
+
+### Helper Functions
+
+```{r}
+#| label: helper-functions
+#| message: false
+#| warning: false
+
+clean_season <- function(season) {
+  season |>
+    as.character() |>
+    stringr::str_extract("\\d{2}$") |>
+    as.integer()
+}
+
+extract_season_from_path <- function(path) {
+  str_extract(path, "\\d{4}-\\d{4}") |>
+    str_sub(-2) |>
+    as.integer()
+}
+
+normalize_squad_names <- function(df) {
+  team_name_lookup <- tibble(
+    old_name = c(
+      "Manchester Utd",
+      "Liverpool",
+      "Chelsea",
+      "Arsenal",
+      "Everton",
+      "Brighton",
+      "Burnley",
+      "Fulham",
+      "Watford",
+      "Brentford",
+      "Southampton",
+      "Bournemouth",
+      "Wolves",
+      "West Brom"
+    ),
+    new_name = c(
+      "Manchester United",
+      "Liverpool FC",
+      "Chelsea FC",
+      "Arsenal FC",
+      "Everton FC",
+      "Brighton & Hove Albion",
+      "Burnley FC",
+      "Fulham FC",
+      "Watford FC",
+      "Brentford FC",
+      "Southampton FC",
+      "AFC Bournemouth",
+      "Wolverhampton Wanderers",
+      "West Bromwich Albion"
+    )
+  )
+
+  df |>
+    left_join(team_name_lookup, by = c("Squad" = "old_name")) |>
+    mutate(Squad = coalesce(new_name, Squad)) |>
+    select(-new_name)
+}
+```
+
+Because the raw data used different season formats, we standardized season values across all datasets. For files named by season, we extracted the last two digits of the ending year. For example, `2019-2020` became `20`, and `2024-2025` became `25`.
+
+### Create the Player Season Dataset
+
+```{r}
+#| label: create-player-season-data
+#| message: false
+#| warning: false
+
+clean_player_data <- function(path) {
+  read_delim(path, delim = ";", show_col_types = FALSE) |>
+    mutate(
+      Season = extract_season_from_path(path)
+    ) |>
+    select(Squad, Pos, CrdY, CrdR, Season) |>
+    normalize_squad_names()
+}
+
+player_season_data <- map_df(players_dataset, clean_player_data)
+```
+
+We created `player_season_data` from the FBref player files used in the disciplinary analysis. Each file represents one Premier League season. We extracted the season from the file name, selected the team, position, yellow card, and red card variables, and standardized team names. We kept the original position labels at this stage so that multi-position players could be split consistently during the disciplinary analysis in the report.
+
+### Creating the Team Season Dataset
+
+```{r}
+#| label: create-team-season-data
+#| message: false
+#| warning: false
+
+team_perf <- pl_performance |>
+  mutate(season = clean_season(season)) |>
+  rename(
+    Season = season,
+    Squad = Squad
+  ) |>
+  filter(between(Season, 20, 25)) |>
+  normalize_squad_names()
+
+transfers_clean <- pl_transfer_spending |>
+  mutate(
+    season = clean_season(season),
+    spend_usd = transfer_spending_eur * 1.08,
+    income_usd = transfer_income_eur * 1.08,
+    net_spend_usd = net_spend_eur * 1.08
+  ) |>
+  rename(
+    Squad = team,
+    Season = season
+  ) |>
+  filter(between(Season, 20, 25)) |>
+  normalize_squad_names()
+
+squad_clean <- pl_squad_values |>
+  mutate(
+    season = clean_season(season)
+  ) |>
+  rename(
+    Squad = team,
+    Season = season,
+    squad_value_eur = squad_value
+  ) |>
+  mutate(
+    squad_value_eur = squad_value_eur |>
+      str_replace_all("€", "") |>
+      str_replace_all("bn", "e9") |>
+      str_replace_all("m", "e6") |>
+      as.numeric()
+  ) |>
+  filter(between(Season, 20, 25)) |>
+  normalize_squad_names()
+
+team_season_data <- team_perf |>
+  inner_join(
+    transfers_clean |>
+      select(Squad, Season, spend_usd, income_usd, net_spend_usd),
+    by = c("Squad", "Season")
+  ) |>
+  inner_join(
+    squad_clean |>
+      select(Squad, Season, squad_value_eur, avg_age),
+    by = c("Squad", "Season")
+  )
+```
+
+We created `team_season_data` by cleaning and merging FBref team performance data with Transfermarkt transfer and squad-value data. Seasons were standardized to the final two digits of the ending year, team names were normalized across sources, transfer values were converted from euros to U.S. dollars, and squad values were parsed from text into numeric values. The final team-season dataset contains one row for each Premier League club in each season and includes both performance variables and financial/squad variables.
+
+### Final Datasets
+
+```{r}
+#| label: write-final-datasets
+#| message: false
+#| warning: false
+
+dir.create("data/analysis", showWarnings = FALSE, recursive = TRUE)
+
+write_csv(team_season_data, "data/analysis/team_season_data.csv")
+write_csv(player_season_data, "data/analysis/player_season_data.csv")
+
+glimpse(team_season_data)
+glimpse(player_season_data)
+```
+
+Finally, we wrote the two cleaned analysis-ready datasets to CSV files. `team_season_data.csv` contains the team-season data used to analyze performance, spending, squad value, and squad age. `player_season_data.csv` contains the player/position disciplinary data used to construct the card-based analysis objects in the report.

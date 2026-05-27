@@ -1,0 +1,27 @@
+---
+title: "What factors have the greatest impact on the performance in the Premier League, UK?"
+subtitle: "Preregistration of analyses"
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-height: 3
+  fig-width: 5
+---
+
+# Hypothesis 1
+
+**We hypothesize that moderate defensive aggression, measured by yellow cards, particularly those occurring in dangerous areas near the goal, can improve team performance by preventing clear scoring opportunities. In contrast, we expect strong defensive aggression, measured by red cards, to negatively impact performance, as teams must continue playing with one fewer player.**
+
+Analysis: For data where each row represents a team-season, we match defensive actions (yellow cards, red cards, and their field locations (calculated using the players positions)) with team performance (points earned). We categorize aggression into moderate (yellow cards) and strong (red cards), and assign field zones using the position of the player who got the card. We then run regression models where we input the frequency and location of yellow cards to predict team performance, testing whether yellow cards in dangerous areas (near the goal) are associated with improved outcomes expecting a positive coeficient ($\beta_{yellow}$ \> 0). Similarly, we analyze red cards by regressing team performance on the number of red cards received, expecting a negative relationship ($\beta_{red}$ \< 0). We also compare team rankings across seasons to examine whether higher red card counts are consistently associated with worse performance.
+
+# Hypothesis 2
+
+**Teams that allocate greater transfer spending while maintaining a younger squad tend to achieve better league performance, controlling for overall squad value.**
+
+Analysis: This study examines whether transfer investment and squad age are associated with team performance, measured by league ranking. Since the available data include total transfer spending, squad age, and squad value, we estimate the following regression:
+
+Ranking\_{team} = $\beta_{0}$ + $\beta_{1}$ \* TransferSpendingTeam + $\beta_{2}$ \* SquadAgeTeam+ $\beta_{3}$ \* SqaudValue + $\epsilon_{team}$
+
+Here, TransferSpending measures how much a team invested in the transfer market, SquadAge captures the overall age profile of the team, and SquadValue controls for baseline squad quality and financial strength. This control is important because stronger teams may both have more valuable squads and achieve better rankings regardless of transfer strategy. We expect higher transfer spending to be associated with better league performance, while younger squads may also perform better if they reflect stronger long-term recruitment and athletic potential. If ranking is coded so that lower numbers indicate better outcomes, then negative coefficients for transfer spending and squad value would imply improved performance.

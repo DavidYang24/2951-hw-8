@@ -1,0 +1,594 @@
+---
+title: "What factors have the greatest impact on the performance in the Premier League, UK?"
+subtitle: "Exploratory data analysis"
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  fig-height: 3
+  fig-width: 5
+---
+
+# Research question(s)
+
+What factors have the greatest impact on the performance in the Premier League, UK? We will evaluate factors such as mean player age across positions, team spending and defensive discipline as a team.
+
+# Data collection and cleaning
+
+Have an initial draft of your data cleaning appendix. Document every step that takes your raw data file(s) and turns it into the analysis-ready data set that you would submit with your final project. Include text narrative describing your data collection (downloading, scraping, surveys, etc) and any additional data curation/cleaning (merging data frames, filtering, transformations of variables, etc). Include code for data curation/cleaning, but not collection.
+
+-   All datasets used in this project were obtained from FBref and Transfermarkt.
+
+-   Player and team performance data were obtained from FBref, which compiles detailed match statistics from official game reports and data providers such as Opta. These datasets include information on players, match participation, and disciplinary records. Because FBref does not allow direct web scraping, all relevant tables were manually exported as CSV files on March 5, 2026.
+
+-   Financial data, including transfer spending and squad values, were obtained from Transfermarkt, which continuously aggregates information from official club announcements, league disclosures, and verified sports journalism. Transfer activity is recorded during official transfer windows, while squad market values are estimated and updated regularly based on performance, age, and market conditions.
+
+```{r}
+# load packages
+
+library(tidyverse)
+library(httr2)
+library(jsonlite)
+library(readxl)
+library(stringr)
+library(readr)
+library(purrr)
+library(scales)
+```
+
+### In the following code cell we obtain datasets that capture disciplinary behavior patterns (yellow and red cards) aggregated by team, position, and season.
+
+```{r}
+# disciplinary behaviour
+players_dataset <- c(
+  "data/Question 3/players_overall_2019-2020.csv",
+  "data/Question 3/players_overall_2020-2021.csv",
+  "data/Question 3/players_overall_2021-2022.csv",
+  "data/Question 3/players_overall_2022-2023.csv",
+  "data/Question 3/players_overall_2023-2024.csv",
+  "data/Question 3/players_overall_2024-2025.csv"
+)
+
+team_performance_dataset <- c(
+  "data/Question 3/pl_overall_2019-2020.csv",
+  "data/Question 3/pl_overall_2020-2021.csv",
+  "data/Question 3/pl_overall_2021-2022.csv",
+  "data/Question 3/pl_overall_2022-2023.csv",
+  "data/Question 3/pl_overall_2023-2024.csv",
+  "data/Question 3/pl_overall_2024-2025.csv"
+)
+
+#Cleaning functions
+read_clean_players <- function(x) {
+  df <- read_delim(x, delim = ";", show_col_types = FALSE) |>
+    mutate(
+      Season = str_extract(x, "\\d{4}-\\d{4}") |> str_sub(-2)
+    ) #I asked chatGpt how to get the last 2 numbers from the title of the CSV
+
+  df |>
+    group_by(Pos, Squad, Season) |>
+    summarize(
+      across(
+        .cols = c(CrdY, CrdR),
+        .fns = ~ sum(.x, na.rm = TRUE),
+        .names = "count_{.col}"
+      ),
+      .groups = "drop"
+    )
+}
+
+concatenate_teams <- function(x) {
+  df <- read_delim(x, delim = ";", show_col_types = FALSE) |>
+    mutate(
+      Season = str_extract(x, "\\d{4}-\\d{4}") |> str_sub(-2)
+    )
+}
+
+#Application
+discipline_by_position <- map(players_dataset, read_clean_players) |>
+  bind_rows()
+
+discipline_by_team <- discipline_by_position |>
+  group_by(Squad, Season) |>
+  summarize(
+    count_CrdY = sum(count_CrdY, na.rm = TRUE),
+    count_CrdR = sum(count_CrdR, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+discipline_by_team <- discipline_by_team |>
+  mutate(
+    Season = as.integer(Season)
+  )
+
+
+team_performance <- map(team_performance_dataset, concatenate_teams) |>
+  bind_rows()
+
+```
+
+-   In cleaning the player dataset, the goal is to construct team-level measures of disciplinary behavior (yellow and red cards) across seasons. The raw data consists of multiple season-specific CSV files, which are stored in a single directory for efficient processing. A function read_clean_players() was created and applied to each file. Within this function, each dataset is read using a consistent delimiter, and a standardized Season variable is extracted from the file name by taking the last two digits of the season string (e.g., “2019-2020” → “20”). The data is then grouped by position, team (Squad), and season, and the total number of yellow cards (CrdY) and red cards (CrdR) is aggregated within each group. This produces a summarized dataset of disciplinary statistics by position.
+
+-   After applying the function to all files and combining them, the data is further aggregated to the team-season level by summing disciplinary counts across all positions. The Season variable is then converted to numeric format to ensure consistency for later merging and analysis.
+
+-   A similar approach is used for the team performance datasets, where each file is read and assigned a standardized Season variable before being combined into a single dataset.
+
+### In the following code cell we create a team-level dataset that combines performance with financial data on transfer spending and squad value across seasons.
+
+```{r}
+# Cleaning the Spending datasets
+
+clean_season <- function(season) {
+  season |>
+    as.character() |>
+    stringr::str_extract("\\d{2}$") |>
+    as.integer()
+}
+
+pl_performance <- read_csv(
+  "data/Question 2/FBRef Data/premier_league_fbref_combined_2014_2026.csv"
+)
+pl_squad_values <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_squad_values_2014_2026.csv"
+)
+pl_transfer_spending <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_transfer_summaries_2014_2026.csv"
+)
+
+#Team Peformance Dataset
+team_perf <- pl_performance |>
+  mutate(season = clean_season(season)) |>
+  rename(
+    Season = season
+  ) |>
+  filter(
+    between(Season, 20, 25)
+  )
+
+
+# Transfers Dataset
+transfers_clean <- pl_transfer_spending |>
+  mutate(
+    season = clean_season(season),
+    spend_usd = transfer_spending_eur * 1.08,
+    income_usd = transfer_income_eur * 1.08,
+    net_spend_usd = net_spend_eur * 1.08
+  ) |>
+  rename(
+    Squad = team,
+    Season = season
+  ) |>
+  filter(
+    between(Season, 20, 25)
+  )
+
+# Squad Value Dataset
+squad_clean <- pl_squad_values |>
+  mutate(
+    season = clean_season(season)
+  ) |>
+  rename(
+    Squad = team,
+    Season = season,
+    squad_value_eur = squad_value
+  ) |>
+  filter(
+    between(Season, 20, 25)
+  )
+
+perf_spending <- team_perf |>
+  inner_join(
+    transfers_clean |>
+      select(Squad, Season, net_spend_usd, spend_usd, income_usd),
+    by = c("Squad", "Season")
+  )
+
+
+```
+
+-   I created a helper function `clean_season()` to standardize the season variable. The raw data had seasons in different formats like 2019/2020, 2019-2020 or 19_20, so this function extracts the last two digits of the season and converts it into an integer making filtering and merging easier.
+
+-   I then loaded 3 datasets
+
+    -   Team performance:
+
+        -   cleaned the `season` column using `clean_season()`
+
+        -   Renamed it to `Season` for consistency
+
+        -   Filtered the data to only include seasons from 2020 to 2025
+
+    -   Transfer spending:
+
+        -   Cleaned `season` column
+
+        -   Converted all financial values from euros to USD using exchange rate of 1.08
+
+        -   Renamed `team` and `season` to `Squad` and `Season` columns to match other datasets
+
+        -   Filtered data to only include seasons from 2020 to 2025
+
+    -   Squad value:
+
+        -   Cleaned and standardized `season`
+
+        -   Renamed columns
+
+        -   Filtered data to only include seasons from 2020 to 2025
+
+### In the following code cell standardizes team names across datasets to ensure consistency.
+
+```{r}
+# Clean up Squad names
+
+team_name_lookup <- tibble(
+  old_name = c(
+    "Manchester Utd",
+    "Liverpool",
+    "Chelsea",
+    "Arsenal",
+    "Everton",
+    "Brighton",
+    "Burnley",
+    "Fulham",
+    "Watford",
+    "Brentford",
+    "Southampton",
+    "Bournemouth",
+    "Wolves",
+    "West Brom"
+  ),
+  new_name = c(
+    "Manchester United",
+    "Liverpool FC",
+    "Chelsea FC",
+    "Arsenal FC",
+    "Everton FC",
+    "Brighton & Hove Albion",
+    "Burnley FC",
+    "Fulham FC",
+    "Watford FC",
+    "Brentford FC",
+    "Southampton FC",
+    "AFC Bournemouth",
+    "Wolverhampton Wanderers",
+    "West Bromwich Albion"
+  )
+)
+
+team_perf <- team_perf |>
+  left_join(team_name_lookup, by = c("Squad" = "old_name")) |>
+  mutate(Squad = coalesce(new_name, Squad)) |>
+  select(-new_name)
+
+discipline_by_team <- discipline_by_team |>
+  left_join(team_name_lookup, by = c("Squad" = "old_name")) |>
+  mutate(Squad = coalesce(new_name, Squad)) |>
+  select(-new_name)
+```
+
+-   During cleaning, I noticed that team names were not consistent across datasets. For example some used names like "ManchesterUtd" or "Chelsea" while others used "Manchester United" or "Chelsea FC". This caused issues when merging because teams weren't being matched properly.
+
+-   To fix this, I created `team_name_lookup` that maps inconsistent team names to a standardized version with the table containing two columns, `old_name` (the original name) and `new_name` (the corrected name)
+
+-   I then applied this mapping to both `team_perf` and `discipline_by_team` using `left_join`. After joining, I used `coalesce()` to replace the original team names with the standardized ones when a match was found and the temporary `new_name` column was removed.
+
+### In the following cell we constructed a comprehensive team-season dataset that included performance, financial, squad characteristics and disciplinary data.
+
+```{r}
+# Main team-level dataset
+
+team_season_data <- team_perf |>
+  inner_join(
+    transfers_clean |>
+      select(Squad, Season, spend_usd, income_usd, net_spend_usd),
+    by = c("Squad", "Season")
+  ) |>
+  inner_join(
+    squad_clean |>
+      select(Squad, Season, squad_value_eur, avg_age),
+    by = c("Squad", "Season")
+  ) |>
+  inner_join(
+    discipline_by_team,
+    by = c("Squad", "Season")
+  )
+```
+
+-   I combined the datasets into one: `team_season_data`. `team_perf` was the base and then I merged the rest using `inner_join` based on `Squad` and `Season`.
+
+-   I joined `transfers_clean`, selecting only relevant variables, ie. spending income, net spending in USD
+
+-   Next, i joined `squad_clean` to add information about overall value of each team which also contains the average age of each team
+
+-   Lastly, I joined `discipline_by_team` to include the number of yellow and red cards for each team-season.
+
+### In the following code cell we construct a cleaned player-level dataset containing individual characteristics across teams and seasons. Usefull to quantify individual and position related contribution to the overall performance.
+
+```{r}
+# Player-Level stats Dataset
+
+clean_player_data <- function(path) {
+  df <- read_excel(path, col_names = FALSE)
+
+  colnames(df) <- as.character(df[3, ])
+  df <- df[-c(1:3), ]
+
+  df <- df |>
+    select(Squad, Player, Age, MP, Pos, CrdY, CrdR) |>
+    filter(
+      Squad != "Squad",
+      Player != "Player",
+      !is.na(Squad),
+      !is.na(Player)
+    ) |>
+    mutate(
+      Pos = sub(",.*", "", Pos),
+      Age = as.numeric(Age),
+      MP = as.numeric(MP),
+      CrdY = as.numeric(CrdY),
+      CrdR = as.numeric(CrdR),
+      Season = str_extract(path, "\\d{4}-\\d{4}") |> str_sub(-2) |> as.integer()
+    )
+
+  df
+}
+
+player_stats <- c(
+  "data/Player_Stats/2019-2020 Player Stats.xlsx",
+  "data/Player_Stats/2020-2021 Player stats.xlsx",
+  "data/Player_Stats/2021-2022 Player Stats.xlsx",
+  "data/Player_Stats/2022-2023 player stats.xlsx",
+  "data/Player_Stats/2023-2024 Player Stats.xlsx",
+  "data/Player_Stats/2024-2025 Player Stats.xlsx"
+)
+
+player_season_data <- map(player_stats, clean_player_data) |>
+  bind_rows()
+```
+
+-   Here, I cleaned and combined the player-level datasets, which were stored as multiple excel files (one for each season).
+
+-   I reused the `clean_season()` function to standardize season values by extracting the last two digits and converting them to integers.
+
+-   Then, I created a function called `clean_player_data()` to process each Excel file. since the raw Excel files did not have clean column headers, I first set the column names using the third row of the file and removed the first three rows, which contained metadata and repeated headers.
+
+-   Next, I selected only the relevant columns for the analysis: `Squad`, player name, age, matches played (`MP`), position (`Pos`), and disciplinary variables (yellow and red cards).
+
+-   I also removed rows that were not acctual player observations. Some rows in the dataset repeated column headers (e.g., rows where `Squad = "Sqaud"` or `Player = "Player"` ) so i filtered those out, along with any rows with missing key values.
+
+-   After that, I cleaned and converted the variables:
+
+    -   Extrated the main position from the `Pos` column
+
+    -   Converted age, matches played and card counts to numeric values
+
+    -   Added a `Season` variable based on the file name
+
+-   Finally, I used `map()` to combine all payer datasets into a single dataframe called `player_season_data` using `bind_rows()`
+
+### In the following code cell we will calculate the average age per team for each season, along with the average age of the league.
+
+```{r}
+# Position-level Age Average
+
+position_age_avg <- player_season_data |>
+  group_by(Pos, Season) |>
+  summarise(
+    league_average_position_age = mean(Age, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+squad_age_avg <- player_season_data |>
+  group_by(Pos, Squad, Season) |>
+  summarise(
+    squad_average_position_age = mean(Age, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+player_season_data |>
+  left_join(position_age_avg, by = c("Pos", "Season")) |>
+  left_join(squad_age_avg, by = c("Pos", "Squad", "Season"))
+```
+
+-   Here I calculated the average age per team for each season, along with the average age of the league, to assist with the later analysis of our regression.
+
+-   I grouped the dataset by position and season to calculate the overall (league-level) average age for each position using summarise(mean(Age)).
+
+-   Then, I created a second summary grouped by position, squad, and season to compute each team’s average age within a position.
+
+-   After knowing the average names, I joined the league-level averages back to the original dataset using left_join() on Pos and Season, to make the original dataset more structures.
+
+-   The final dataset preserves all players while adding both comparison metrics.
+
+# Data description
+
+## Observations and Attributes
+
+-   The analysis uses multiple datasets that were merged into a two datasets, a team-season level dataset and a player-season level dataset from the 2019/2020 - 2024/2025 Seasons of the Premier league
+
+### Team-Season Level
+
+-   The team-season level dataset is the main dataset used for analysis. Each observation represents a team in a given Premier League season. The attributes include:
+
+    -   **Performance:** Total points, league position, goal difference, etc.
+
+    -   **Financial:** Transfer spending, transfer income, net transfer spending
+
+    -   **Squad-level:** Average team age
+
+    -   **Disciplinary:** Total yellow cards and red cards per season per team
+
+-   This dataset was constructed by merging multiple datasets using team and season key as the identifiers
+
+### Player-Season Dataset
+
+-   contains information at the individual player level. Each observation represents a player in a give season, with attributes including:
+
+    -   **Player:** age, position, team
+
+    -   **Playing time:** Matches played (MP)
+
+    -   **Disciplinary:** Yellow cards and red cards
+
+## Why was this dataset created?
+
+-   For Sports analytics and reporting by clubs, media and fans. Data is designed to track player and team performance.
+
+## Who funded the creation of the dataset
+
+For Fbref, they are a part of Sports Reference LLC. From 2018 to 2023, their data comes form StatsBomb; in the recent 3 years, their data is provided by Opta, a part of Stat Perform. Their funding is mainly from private equities, and their revenue comes from subscription and API services for sports companies.
+
+Data constraints or things to know from Fbref - Basic Stats generally include goals scored, minutes, matches and cards. - Intermediate Stats will include basic statistical information like crosses, tackles won, shots, and interceptions at the player and team level. - Positional Data Since 2014-15, Player Position Data is constructed from season-level data. This means results may include players who may not have played a position regularly. Prior to 2014-15, Position data is based on career-level positional data.
+
+## What processes might have influenced what data was observed and recorded and what was not?
+
+Opta get their data from both AI and human watching. Although it's professional, it may still lead to bias and errors as it's computed by human at real time.
+
+## What preprocessing was done, and how did the data come to be in the form that you are using?
+
+-   Season formats were standardized by extracting the final two digits (e.g. "24_25" and "24-25" were converted to "25")
+
+-   Column names were standardized across datasets
+
+-   Separate datasets (performance, transfer spending, squad characteristics, and disciplinary records)were merged using team and season
+
+-   Team performance was measured using either total points or league position
+
+-   A log transformation was applied
+
+# Data limitations
+
+Identify any potential problems with your dataset.
+
+-   Player position classifications are inconsistent across years, making comparisons unreliable.
+
+-   Players who switch teams mid-season may distort team-level averages like age and position.
+
+-   Undisclosed transfer fees or bonuses may underestimate true financial spending of team.
+
+-   Differences in data collection methods across provides i.e. StatsBomb to Opta may introduce inconsistencies over time.
+
+-   High card counts may reflect aggressive playing syles rather than poor performance
+
+-   Potential omission of confounding variables such as squad depth, manager quality, tactics and player quality.
+
+# Exploratory data analysis
+
+Perform an (initial) exploratory data analysis.
+
+## Performance by Season
+
+```{r}
+# Performance by Season
+ggplot(
+  team_season_data,
+  mapping = aes(x = factor(Season), y = Pts)
+) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Team Performance by Season",
+    x = "Season",
+    y = "Total points"
+  ) +
+  theme_minimal()
+```
+
+-   The median number of points remains relatively consistent across seasons, suggesting that the overall level of a "typical" team's performance hasn't changed drastically over time
+
+-   The spread of team performance has also been relatively stable across seasons, indicating a consistent level of competitiveness within the league
+
+-   Several seasons however have high-end outliers, representing exceptionally dominant teams that achieved significantly more points than the rest of the league.
+
+## Defensive Discipline Vs Performance
+
+```{r}
+# Yellow Cards vs Performance
+ggplot(team_season_data, aes(x = count_CrdY, y = Pts)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Yellow Cards vs Team Performance",
+    x = "Yellow cards",
+    y = "Total points"
+  ) +
+  theme_minimal()
+```
+
+-   There's a negative relationship between yellow cards and team performance. However, the relationship appears weak, and there's a substantial variation in points for teams with similar numbers of yellow cards.
+
+-   This wide spread of points across all levels of yellow cards and some teams achieving relatively high performance despite accumulating a large number of yellow cards suggests that disciplinary behavior alone is not a strong predictor of team performance.
+
+```{r}
+# Red Cards Vs performance
+ggplot(team_season_data, aes(x = count_CrdR, y = Pts)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Red Cards vs Team Performance(Points)",
+    x = "Red cards",
+    y = "Total points"
+  ) +
+  theme_minimal()
+```
+
+-   The scatterplot shows a slight negative relationship between red cards and team performance, indicating that teams receiving more red cards ten to earn fewer points. However, this relationship is weak, as there is substantial variation in performance among teams with similar numbers of read card suggesting that red cards alone are not a strong determinant of ream success.
+
+## Spending vs. Performance
+
+```{r}
+
+# Spending Vs. Performance
+
+ggplot(team_season_data, aes(x = net_spend_usd, y = Rk)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  scale_x_log10(labels = dollar_format()) +
+  labs(
+    title = "Net Transfer Spending vs Team Performance(League Position)",
+    x = "Net transfer spending (log scale, USD)",
+    y = "League Position"
+  ) +
+  theme_minimal()
+```
+
+-   The scatterplot shows a positive relationship between net transfer and team performance ( measured by league position), indicating that teams that invest more financially tend to earn more points. However, the relationship is only moderate, as there is substantial variation in performance among teams with similar spending levels.
+
+-   The use of a log scale suggests diminishing returns to spending, where increases in spending have a small marginal impact at higher levels.
+
+-   Several teams also deviate from the overall trend, with some high spending teams underperforming and some-lower spending teams performing moderately well, indicating spending alone doesn't fully determine success.
+
+## Average Age Vs Performance
+
+```{r}
+# Average Age Vs. Performance
+
+ggplot(team_season_data, mapping = aes(x = avg_age, y = Rk)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Relationship Between Average Team Age and Performance",
+    x = "Average team age",
+    y = "League Position"
+  ) +
+  theme_minimal()
+```
+
+-   The scatterplot shows a very slight negative relationship between average team age and league position, suggesting that slightly older teams may perform marginally better. However, this relationship is extremely weak, as there's substantial variation in performance among teams with similar average ages indicating that average team age is not a strong indicator of team success.
+
+# Questions for reviewers
+
+List specific questions for your peer reviewers and project mentor to answer in giving you feedback on this phase.
+
+-   Should we adjust transfer spending values for inflation across seasons, and if so, would this meaningfully affect the interpretation of spending-performance relationships in our analysis?
+
+-   Is total points the most appropriate measure of team performance for our analysis, or would an alternative metric like goal difference, points per game, or league position (rank) better capture the differences in team success?
+
+-   As we move toward regression analysis, how many and which types of control variables would be appropriate to include without over-complicating the model?
+
+-   given that several of our predictors show weak relationships with performance ,how should we best present and interpret these findings without overstating their importance?
+
+-   Is the use of log scale for transfer spending appropriate in this context, and should we formally justify this transformation in our analysis?
+
+-   For the next phase, would a simple linear regression be sufficient or should we consider more complex models eg. multiple regression?

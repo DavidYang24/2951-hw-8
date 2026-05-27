@@ -1,0 +1,229 @@
+---
+title: "What factors have the greatest impact on the performance in the Premier League, UK?"
+subtitle: "Proposal"
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-height: 3
+  fig-width: 5
+---
+
+```{r}
+#| label: load-pkgs
+#| message: false
+
+library(tidyverse)
+library(skimr)
+library(rvest)
+library(robotstxt)
+library(janitor)
+library(worldfootballR)
+```
+
+# Research question 1 -- David Yang
+
+## Introduction and research question
+
+-   Research Question: Will the average age in different positions on the squad affect the team's performance in Big 5 soccer leagues? <!-- A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.) -->
+-   This research will examine whether the average age of players in different positional groups on a soccer team affects overall team performance in the Big 5 European leagues (Premier League, La Liga, Serie A, Bundesliga, and Ligue 1). Soccer performance depends on a mix of experience, tactical awareness, and physical ability, all of which are related to player age. Younger players may provide greater speed, stamina, and pressing ability, while older players often contribute experience, decision-making, and leadership. Because different positions require different physical and tactical skills, the impact of age may vary across positions such as forwards, midfielders, defenders, and goalkeepers.
+
+The main hypothesis is that the average age of players in certain positions is associated with team performance. Specifically, teams with younger forwards and midfielders may perform better due to greater physical intensity and attacking dynamism, while teams with older defenders or goalkeepers may benefit from experience and positional awareness, which could positively influence defensive stability. Therefore, the study hypothesizes that the relationship between player age and team performance differs by position group. <!-- A description of the research topic along with a concise statement of your hypotheses on this topic. --> - The research question involves both categorical variables and quantitative variables. Categorical variables • Player position • Team • League (Premier League, La Liga, Bundesliga, Serie A, Ligue 1)
+
+```         
+Quantitative variables
+•   Average age of players in each position group in each team
+•   Team performance indicators (such as total points, win percentage, goal difference, league ranking)
+•   average minutes played
+•   goals scored, defensive statistics
+<!-- Identify the types of variables in your research question. Categorical? Quantitative? -->
+```
+
+## Data
+
+For each dataset:
+
+-   The source of all data sets are febref, which is a very professional soccer statistical website that contains data from most of the leagues, and being widely used for professional soccer analysts. I exported them into csv files as of Mar.5.2026, because the website does not allow web scraping directly. <!-- Identify the source of the data. -->
+
+-   The data source originally comes from Opta. Opta serves as the major provider of many sports data. They gets its data from both human watchig and AI methods. Usually in major matches, there are 3 human watching and doing statistical work in real time, and AI assisted witht he process. <!-- State when and how it was originally collected (by the original data curator, not necessarily how you found the data). -->
+
+-   I observed that there is a huge gap between leading teams and later teams. Also age gap between strikers and defenders is also huge, which could be a good starting point for our further analysis. <!-- Write a brief description of the observations. -->
+
+## Glimpse of data
+
+```{r}
+#| label: load-data-1
+
+# add code here
+big_5_player = read_csv("data/Question 1/big5_player_stats_2025_2026_fbref.csv")
+premier_league_results = read_csv(
+  "data/Question 1/10_results2025-202691_overall.csv"
+)
+premier_league_homw_away = read_csv(
+  "data/Question 1/11_results2025-202691_home_away.csv"
+)
+premier_league_fouls = read_csv("data/Question 1/20_stats_squads_misc_for.csv")
+premier_league_playing_time = read_csv(
+  "data/Question 1/18_stats_squads_playing_time_for.csv"
+)
+
+skimr::skim(big_5_player)
+skimr::skim(premier_league_results)
+skimr::skim(premier_league_homw_away)
+skimr::skim(premier_league_fouls)
+skimr::skim(premier_league_playing_time)
+
+glimpse(big_5_player)
+glimpse(premier_league_results)
+glimpse(premier_league_homw_away)
+glimpse(premier_league_fouls)
+glimpse(premier_league_playing_time)
+```
+
+# Research question 2
+
+## Introduction and research question
+
+-   A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.)
+    -   **Does higher team spending lead to better league performance in professional soccer?**
+-   A description of the research topic along with a concise statement of your hypotheses on this topic.
+    -   Professional soccer has become increasingly influenced by financial investment, particularly in major European leagues where clubs spend large amounts on player transfers and wages. Wealthier clubs are often able to recruit higher-quality players and maintain deeper squads, which may provide a competitive advantage over teams with fewer financial resources.
+    -   This project aims to examine the relationship between team financial investment and on-field performance. Specifically, it will investigate whether teams with higher squad market values or higher transfer spending tend to perform better in league competitions.
+    -   The primary hypothesis is that teams with higher financial investment will tend to achieve better league outcomes, measured by points earned during the season or final league position.
+    -   A secondary hypothesis is that financial investment alone does not fully explain team performance, suggesting that other factors such as goals scored, defensive performance, and team composition may also play important roles.
+-   Identify the types of variables in your research question. Categorical? Quantitative?
+    -   **Quantitative**
+        -   Squad market value
+        -   Transfer spending
+        -   Goals scored
+        -   Goals conceded
+        -   Points earned in a season
+        -   Average squad age
+    -   **Categorical Variables**
+        -   Team name
+        -   League
+        -   Season
+    -   **Outcome variable**
+        -   League performance (measured by total points earned or final league position
+
+## Data
+
+For each dataset:
+
+-   Identify the source of the data.
+
+    -   <https://www.transfermarkt.com/>
+
+    -   <https://fbref.com/en/>
+
+-   State when and how it was originally collected (by the original data curator, not necessarily how you found the data).
+
+    -   **Transfermarkt**
+
+        -   Data is continuously compiled and updated by the platform using information from official club announcements, league reports, financial disclosures, and verified sports journalism sources. The platform tracks player transfers, squad market values, and team rosters across professional soccer leagues worldwide.
+
+        -   Transfer info such as transfer fees, player movements, and contract details are recorded at the time transfers occur during official transfer windows. Squad market values are estimated and updated regularly based on factors such as player performance, age, contract length, and market activity. The platform has been collecting and maintaining these records since the early 2000s and updates them throughout each season.
+
+    -   **FBref**
+
+        -   Data is compiled from official match reports and event data recorded during professional soccer matches. FBref aggregates detailed match stats such as goals, assists, shots, possession, and other performance metrics.
+
+-   Write a brief description of the observations.
+
+    -   Each observation in the dataset represents a team in a specific season within a professional soccer league. For each team and season, the dataset records information about the club's financial investment and on-field performance. This includes variables such as the team name, league, season, squad market value, transfer spending, goals scored, goals conceded, total points earned, and final league position. By structuring the data at the team-season level, the dataset allows for comparisons across teams across seasons to analyze how financial factors may relate to competitive performance.
+
+## Glimpse of data
+
+```{r}
+# #| label: load-data-2
+# # add code here
+pl_performance <- read_csv(
+  "data/Question 2/FBRef Data/premier_league_fbref_combined_2014_2026.csv"
+)
+pl_squad_values <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_squad_values_2014_2026.csv"
+)
+pl_transfer_spending <- read_csv(
+  "data/Question 2/Transfermarkt_data/premier_league_transfer_summaries_2014_2026.csv"
+)
+
+glimpse(pl_performance)
+glimpse(pl_squad_values)
+glimpse(pl_transfer_spending)
+
+```
+
+# Research question 3
+
+## Introduction and research question
+
+-   Research Question: Does defensive discipline (fouls, yellow cards, and red cards) affect team performance in the Premier League UK? <!-- A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.) -->
+
+-   This study will investigate whether teams with higher numbers of fouls and disciplinary cards tend to perform worse in Premier League. Team performance will be measured through outcomes such as total points, goal difference, and league ranking. To conduct this study we will analyze trends across time. The main hypothesis is that teams with poorer disciplinary records (more fouls, yellow cards, and red cards) will generally perform worse in the league standings. However, a secondary hypothesis is that moderate defensive aggression may not negatively impact performance and may even correlate with stronger defensive statistics. <!--  A description of the research topic along with a concise statement of your hypotheses on this topic. -->
+
+-   The research question involves both categorical variables and quantitative variables. Categorical variables • Team
+
+    Quantitative variables • Total fouls committed • Yellow cards received • Red cards received • Team performance indicators (such as total points, win percentage, goal difference, league ranking) • goals scored, goal difference <!-- Identify the types of variables in your research question. Categorical? Quantitative?-->
+
+## Data
+
+For each dataset:
+
+-   The source of all data sets are febref, which is a very professional soccer statistical website that contains data from most of the leagues, and being widely used for professional soccer analysts. I exported the data to csv files as of Mar.7.2026, because the website does not allow web scraping directly. <!-- Identify the source of the data.-->
+
+-   The data source originally comes from Opta. Opta serves as the major provider of many sports data. They gets its data from both human watchig and AI methods. Usually in major matches, there are 3 human watching and doing statistical work in real time, and AI assisted witht the process. <!-- State when and how it was originally collected (by the original data curator, not necessarily how you found the data). -->
+
+-   Each observation in the dataset represents a team in the Premier League across season, beginning with the 2019–2020 season and continuing through the 2024–2025 season. For each team-season combination, the dataset records team-level disciplinary and defensive statistics that occurred during league matches. Because the data is aggregated at the season level, the values represent totals accumulated across all matches played by a team during that season. The dataset includes variables such as the number of yellow cards (CrdY), red cards (CrdR), fouls committed (Fls), fouls drawn (Fld), offsides (Off), crosses (Crs), interceptions (Int), tackles won (TklW), and own goals (OG) for each team. These statistics are aggregated across matches played in the season. <!-- Write a brief description of the observations. -->
+
+## Glimpse of data
+
+```{r}
+#| label: load-data-3
+
+# add code here
+premier_league_results_19_20 = read_csv(
+  "data/Question 3/pl_overall_2019-2020.csv"
+)
+premier_league_results_20_21 = read_csv(
+  "data/Question 3/pl_overall_2020-2021.csv"
+)
+premier_league_results_21_22 = read_csv(
+  "data/Question 3/pl_overall_2021-2022.csv"
+)
+premier_league_results_22_23 = read_csv(
+  "data/Question 3/pl_overall_2022-2023.csv"
+)
+premier_league_results_23_24 = read_csv(
+  "data/Question 3/pl_overall_2023-2024.csv"
+)
+premier_league_results_24_25 = read_csv(
+  "data/Question 3/pl_overall_2024-2025.csv"
+)
+
+premier_league_fouls_19_20 = read_csv(
+  "data/Question 3/misc_stats_2019-2020.csv"
+)
+premier_league_fouls_20_21 = read_csv(
+  "data/Question 3/misc_stats_2020-2021.csv"
+)
+premier_league_fouls_21_22 = read_csv(
+  "data/Question 3/misc_stats_2021-2022.csv"
+)
+premier_league_fouls_22_23 = read_csv(
+  "data/Question 3/misc_stats_2022-2023.csv"
+)
+premier_league_fouls_23_24 = read_csv(
+  "data/Question 3/misc_stats_2023-2024.csv"
+)
+premier_league_fouls_24_25 = read_csv(
+  "data/Question 3/misc_stats_2024-2025.csv"
+)
+
+# I only glimpsed one of each as the structure of the csv is the exact same.
+# The only thing that changes is the data store in the cells as it is dependent of the season.
+
+glimpse(premier_league_results_19_20)
+glimpse(premier_league_fouls_19_20)
+
+```
